@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { plate } from './cake-mesh';
-import { flavors } from './domain';
-import { trayLayout, trayX } from './positions';
+import { plateCapacity } from './catalog';
+import { trayLayout, trayCenter } from './positions';
 
 function box(scene: THREE.Group, size: number[], position: number[], color: string) {
   const object = new THREE.Mesh(new THREE.BoxGeometry(...size as [number, number, number]), new THREE.MeshStandardMaterial({ color, roughness: 0.8 }));
@@ -30,14 +30,15 @@ export function makeRoom() {
   for (let x = -5; x <= 5; x += 0.38) box(room, [0.055, 1.1, 0.03], [x, 0.72, -0.43], '#e7a19a');
   box(room, [9.5, 0.16, 4], [0, 0.65, 1.65], '#f0e8db');
   box(room, [9.1, 0.52, 3.7], [0, 0.32, 1.65], '#e8d4c0');
-  const trayWidth = (flavors.length - 1) * trayLayout.spacing + 2 * trayLayout.radius + 0.24;
-  const serving = new THREE.Mesh(new THREE.BoxGeometry(trayWidth, 0.10, 2.5), new THREE.MeshStandardMaterial({ color: '#6faaa2', roughness: 0.55 }));
+  const trayWidth = (trayLayout.columns - 1) * trayLayout.spacing + 2 * trayLayout.radius + 0.24;
+  const trayDepth = trayLayout.rowSpacing + 2 * trayLayout.radius + 0.24;
+  const serving = new THREE.Mesh(new THREE.BoxGeometry(trayWidth, 0.10, trayDepth), new THREE.MeshStandardMaterial({ color: '#6faaa2', roughness: 0.55 }));
   serving.position.set(trayLayout.centerX, 0.79, trayLayout.z);
   serving.receiveShadow = true;
   room.add(serving);
-  flavors.forEach((_, index) => {
+  Array.from({ length: plateCapacity }, (_, index) => index).forEach((index) => {
     const dish = plate(trayLayout.radius);
-    dish.position.set(trayX(index), 0.89, trayLayout.z);
+    dish.position.copy(trayCenter(index));
     room.add(dish);
   });
   for (const x of [-3.1, 0, 3.1]) {

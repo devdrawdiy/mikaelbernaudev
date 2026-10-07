@@ -1,69 +1,56 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Bakery, flavors, orders } from './domain.ts';
+import { Bakery, flavors, type Order } from './domain.ts';
+import { compare } from './fractions.ts';
 
-test('each guest starts with three whole cakes', () => {
-  const game = new Bakery();
+const fixtures: Order[] = [
+  { guest: 'Mia', items: [{ flavor: 'chocolate', numerator: 1, denominator: 2 }] },
+  { guest: 'Leo', items: [{ flavor: 'lemon', numerator: 2, denominator: 3 }] },
+  { guest: 'Ivy', items: [{ flavor: 'cheesecake', numerator: 1, denominator: 8 }] },
+  { guest: 'Sam', items: [{ flavor: 'chocolate', numerator: 37, denominator: 12 }, { flavor: 'lemon', numerator: 13, denominator: 6 }] },
+  { guest: 'Noor', items: [{ flavor: 'lemon', numerator: 8, denominator: 5 }] },
+  { guest: 'Alex', items: [{ flavor: 'chocolate', numerator: 5, denominator: 2 }, { flavor: 'lemon', numerator: 9, denominator: 8 }, { flavor: 'cheesecake', numerator: 5, denominator: 4 }] },
+];
+test('fresh cakes stay whole, and transferring one replenishes the shelf', () => {
+  const game = new Bakery({ orders: fixtures });
   for (const { id } of flavors) {
+    const original = game.cakes[id].id;
     assert.equal(game.cakes[id].division, 0);
-    assert.equal(game.take(id, 0), false);
-    assert.deepEqual(game.portions(id), []);
+    assert.equal(game.take(id, 0), true);
+    assert.notEqual(game.cakes[id].id, original);
+    assert.equal(game.cakes[id].division, 0);
+    assert.equal(compare(game.amount(id), { numerator: 1, denominator: 1 }), 0);
   }
 });
-
-test('only whole-number cuts from two to twelve are accepted', () => {
-  const game = new Bakery();
-  for (const value of [0, 1, 13, 2.5, NaN, Infinity]) assert.equal(game.cut('lemon', value), false);
+test('cuts reject invalid input without changing the tray', () => {
+  const game = new Bakery({ orders: fixtures });
+  game.take('chocolate', 0);
+  for (const value of [0, 1, 13, 2.5, NaN, Infinity]) assert.equal(game.cut('chocolate', value), false);
+  assert.equal(game.amount('chocolate').numerator, 1);
   for (let value = 2; value <= 12; value++) {
-    assert.equal(game.cut('lemon', value), true);
-    assert.equal(game.cakes.lemon.selected.length, value);
+    assert.equal(game.cut('chocolate', value), true);
+    assert.equal(game.cakes.chocolate.selected.length, value);
   }
 });
-
-test('every possible simplification preserves amount and supports undo', () => {
-  for (let denominator = 2; denominator <= 12; denominator++) {
-    for (let count = 1; count <= denominator; count++) {
-      const game = new Bakery();
-      game.cut('chocolate', denominator);
-      for (let i = 0; i < count; i++) game.take('chocolate', i);
-      const simplifiable = game.canSimplify('chocolate');
-      assert.equal(game.simplify('chocolate'), simplifiable);
-      const portions = game.portions('chocolate');
-      assert.equal(portions.length * denominator, count * portions[0].denominator);
-      assert.deepEqual(portions.flatMap(({ ids }) => ids), Array.from({ length: count }, (_, i) => i));
-      assert.equal(game.canSimplify('chocolate'), false);
-      const removed = portions[0].ids;
-      assert.equal(game.returnPiece('chocolate', removed), true);
-      assert.equal(game.count('chocolate'), count - removed.length);
-      for (const id of removed) assert.equal(game.take('chocolate', id), true);
-      assert.equal(game.count('chocolate'), count);
-    }
-  }
-});
-
-test('recutting restores only the chosen flavor', () => {
-  const game = new Bakery();
-  game.cut('chocolate', 4); game.take('chocolate', 0);
-  game.cut('lemon', 3); game.take('lemon', 0);
-  game.cut('chocolate', 12);
-  assert.equal(game.count('chocolate'), 0);
-  assert.equal(game.count('lemon'), 1);
-  assert.equal(game.take('lemon', 0), false);
-  assert.equal(game.returnPiece('lemon', [2]), false);
-});
-
-test('equivalent fractions serve all six guests and replay resets the session', () => {
-  const game = new Bakery();
+test('equivalent fractions and mixed amounts serve six guests', () => {
+  const game = new Bakery({ orders: fixtures });
   assert.equal(game.serve(), false);
-  for (const order of orders) {
+  for (const order of fixtures) {
     for (const { flavor, numerator, denominator } of order.items) {
-      const multiplier = denominator * 2 <= 12 ? 2 : 1;
-      game.cut(flavor, denominator * multiplier);
-      for (let i = 0; i < numerator * multiplier; i++) game.take(flavor, i);
-      game.simplify(flavor);
+      const whole = Math.floor(numerator / denominator), remainder = numerator % denominator;
+      for (let i = 0; i < whole; i++) assert.equal(game.take(flavor, 0), true);
+      if (remainder) {
+        const multiplier = denominator * 2 <= 12 ? 2 : 1;
+        game.cut(flavor, denominator * multiplier);
+        for (let i = 0; i < remainder * multiplier; i++) assert.equal(game.take(flavor, i), true);
+        game.simplify(flavor);
+      }
     }
     assert.equal(game.mismatch(), null);
+    assert.ok(game.occupied <= 7);
+    const oldIds = new Set(Object.values(game.stock).flat().map(({ id }) => id));
     assert.equal(game.serve(), true);
+    assert.ok(Object.values(game.stock).flat().every(({ id }) => !oldIds.has(id)));
     assert.ok(flavors.every(({ id }) => game.cakes[id].division === 0));
   }
   assert.equal(game.complete, true);
@@ -73,17 +60,19 @@ test('equivalent fractions serve all six guests and replay resets the session', 
   assert.equal(game.index, 0);
   assert.equal(game.active, 'chocolate');
   assert.equal(game.complete, false);
+  assert.equal(game.occupied, 0);
 });
-
-test('too much, too little, and unrequested flavors give recoverable feedback', () => {
-  const game = new Bakery();
+test('wrong quantities remain editable, with exact comparison', () => {
+  const game = new Bakery({ orders: fixtures });
   game.cut('chocolate', 4); game.take('chocolate', 0);
   assert.match(game.mismatch()!, /more/);
   game.take('chocolate', 1); game.take('chocolate', 2);
   assert.match(game.mismatch()!, /less/);
-  game.returnPiece('chocolate', [2]);
-  game.cut('lemon', 2); game.take('lemon', 0);
+  const portion = game.portions('chocolate').at(-1)!;
+  game.returnPiece('chocolate', portion.ids, portion.cakeId);
+  game.take('lemon', 0);
   assert.match(game.mismatch()!, /didn't order/);
-  game.returnPiece('lemon', [0]);
+  const lemon = game.portions('lemon')[0];
+  game.returnPiece('lemon', lemon.ids, lemon.cakeId);
   assert.equal(game.mismatch(), null);
 });

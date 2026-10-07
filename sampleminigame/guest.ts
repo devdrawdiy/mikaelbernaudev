@@ -28,11 +28,15 @@ export function makeGuest() {
   mouth.rotation.z = Math.PI;
   mouth.position.set(0, 2.49, 0.357);
   guest.add(mouth);
-  for (const x of [-0.46, 0.46]) {
+  for (const x of [-0.38, 0.38]) {
+    const shoulder = new THREE.Group();
+    shoulder.name = x > 0 ? 'left-arm' : 'right-arm';
+    shoulder.position.set(x, 2.2, 0.04);
+    shoulder.rotation.z = x < 0 ? -0.4 : 0.4;
     const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.095, 0.35, 3, 8), body.material);
-    arm.position.set(x, 1.99, 0.04);
-    arm.rotation.z = x < 0 ? -0.4 : 0.4;
-    guest.add(arm);
+    arm.position.y = -0.22;
+    const hand = sphere(0.10, '#dba987'); hand.position.y = -0.49;
+    shoulder.add(arm, hand); guest.add(shoulder);
   }
   guest.position.set(0.8, 0, -2.8);
   return guest;

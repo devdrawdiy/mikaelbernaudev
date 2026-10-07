@@ -21,30 +21,37 @@ export class Controller {
   }
   refresh() { this.ui.render(this.state, this.spread, this.locked); this.scene.sync(this.state, this.spread); }
   action(button: HTMLElement) {
-    const { action, flavor, id, ids } = button.dataset;
+    const { action, flavor, id, ids, cake } = button.dataset;
     if (action === 'sound') return this.toggleSound(button);
     if (this.locked) return;
-    if (action === 'replay') { this.state.replay(); this.spread = false; this.scene.resetGuest(); this.ui.reset(); this.refresh(); return; }
+    if (action === 'replay') { this.state.replay(); this.spread = false; this.scene.resetGuest(); this.scene.greeting.start(this.scene.motion.reduced); this.ui.reset(); this.refresh(); return; }
     if (this.state.complete) return;
     if (action === 'flavor') return this.select(flavor as Flavor);
+    if (action === 'batch' && this.state.selectCake(this.state.active, Number(cake))) { this.ui.select(this.state.active, this.state.cakes[this.state.active].division); this.refresh(); return; }
     if (action === 'minus' || action === 'plus') {
       const next = Math.max(2, Math.min(12, (Number(this.ui.input.value) || 4) + (action === 'plus' ? 1 : -1)));
       this.ui.input.value = String(next); this.ui.input.setCustomValidity(''); return;
     }
     if (action === 'spread') { this.spread = !this.spread; this.refresh(); }
-    if (action === 'take') this.pick({ flavor: this.state.active, ids: [Number(id)], tray: false, shelf: false });
-    if (action === 'return') this.pick({ flavor: flavor as Flavor, ids: ids!.split(',').map(Number), tray: true, shelf: false });
+    if (action === 'take' || action === 'whole') this.pick({ flavor: this.state.active, cakeId: this.state.cakes[this.state.active].id, ids: [action === 'whole' ? 0 : Number(id)], tray: false, shelf: false, whole: action === 'whole' });
+    if (action === 'return') this.pick({ flavor: flavor as Flavor, cakeId: Number(cake), ids: ids!.split(',').map(Number), tray: true, shelf: false });
     if (action === 'simplify' && this.state.simplify(flavor as Flavor)) { this.ui.say(`${flavorInfo(flavor as Flavor).name} pieces joined. Same amount of cake!`, 'success'); this.chime(); this.refresh(); }
     if (action === 'clear') { this.state.clear(); this.ui.say(''); this.refresh(); }
     if (action === 'serve') this.serve();
   }
-  select(flavor: Flavor) { this.state.active = flavor; this.ui.select(flavor); this.ui.say(''); this.refresh(); }
+  select(flavor: Flavor) { this.state.active = flavor; this.ui.select(flavor, this.state.cakes[flavor].division); this.ui.say(''); this.refresh(); }
   pick(selection: Selection) {
     if (this.locked || this.state.complete) return;
     if (selection.shelf) return this.select(selection.flavor);
-    if (this.scene.busy(selection.flavor, selection.ids)) return;
-    const changed = selection.tray ? this.state.returnPiece(selection.flavor, selection.ids) : this.state.take(selection.flavor, selection.ids[0]);
-    if (changed) { this.ui.say(''); this.chime(520); this.refresh(); }
+    if (this.scene.busy(selection.flavor, selection.ids, selection.cakeId)) return;
+    const changed = selection.tray ? this.state.returnPiece(selection.flavor, selection.ids, selection.cakeId) : selection.whole ? this.state.takeWhole(selection.flavor, selection.cakeId) : this.state.take(selection.flavor, selection.ids[0], selection.cakeId);
+    if (changed) {
+      if (selection.tray || this.state.cakes[selection.flavor].id !== selection.cakeId) {
+        this.spread = selection.tray && this.state.cakes[selection.flavor].division > 0;
+        this.ui.select(this.state.active, this.state.cakes[this.state.active].division);
+      }
+      this.ui.say(''); this.chime(520); this.refresh();
+    } else if (!selection.tray && this.state.trayFull) this.ui.say('All seven plates are in use. Return a portion to free a plate.');
   }
   async cut() {
     if (this.locked || this.state.complete) return;
@@ -55,7 +62,7 @@ export class Controller {
     this.ui.pending[this.state.active] = count;
     const cake = this.state.cakes[this.state.active];
     if (cake.division) {
-      this.locked = true; cake.selected.fill(false); cake.merged = false;
+      this.locked = true; this.state.restoreCurrent();
       this.spread = false; this.refresh(); await this.pause(650);
       if (this.disposed) return;
     }

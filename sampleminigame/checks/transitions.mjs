@@ -2,6 +2,7 @@ import { dependency } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
+import { fulfill, ready } from './driver.mjs';
 const { chromium } = dependency('playwright');
 const sharp = dependency('sharp');
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
@@ -16,6 +17,7 @@ async function hairCenter() {
   const { data, info } = await sharp(image).extract({ left: 0, top: 150, width: 1440, height: 95 }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
   let total = 0, sum = 0;
   for (let y = 0; y < info.height; y++) for (let x = 0; x < info.width; x++) {
+    if (x < 140) continue;
     const i = (y * info.width + x) * info.channels, [r, g, b] = data.subarray(i, i + 3);
     if (r > 85 && r < 175 && g > 45 && g < 135 && b > 45 && b < 140 && r > g * 1.25 && Math.abs(g - b) < 20) { total++; sum += x; }
   }
@@ -28,24 +30,23 @@ try {
   const layout = await page.evaluate(async () => {
     const { makeRoom } = await import('/sampleminigame/room.ts');
     const { trayPose } = await import('/sampleminigame/positions.ts');
-    const { flavors } = await import('/sampleminigame/domain.ts');
+    const { plateCapacity } = await import('/sampleminigame/catalog.ts');
     const room = makeRoom();
-    const plates = room.children.filter((object) => object.type === 'Group').slice(0, 3).map((group) => {
+    const plates = room.children.filter((object) => object.type === 'Group').slice(0, plateCapacity).map((group) => {
       const geometry = group.children[0].geometry; geometry.computeBoundingBox();
-      return { center: group.position.x, left: group.position.x + geometry.boundingBox.min.x, right: group.position.x + geometry.boundingBox.max.x };
+      return { x: group.position.x, z: group.position.z, radius: geometry.boundingBox.max.x };
     });
-    const targets = flavors.map(({ id }) => trayPose(id, 0, 1).position.x);
+    const targets = plates.map((_, index) => { const position = trayPose(index, 0, 1).position; return { x: position.x, z: position.z }; });
     room.traverse((object) => { if (object.isMesh) object.geometry.dispose(); });
     return { plates, targets };
   });
   layout.plates.forEach((plate, index) => {
-    assert.equal(plate.center, layout.targets[index], 'Cake destination differs from plate center');
-    if (index) assert.ok(plate.left > layout.plates[index - 1].right, 'Preview plates overlap');
+    assert.equal(plate.x, layout.targets[index].x); assert.equal(plate.z, layout.targets[index].z);
+    for (const other of layout.plates.slice(0, index)) assert.ok(Math.hypot(plate.x - other.x, plate.z - other.z) > plate.radius + other.radius, 'Preview plates overlap');
   });
+  assert.equal(layout.plates.length, 7);
   await screenshot('plates-separated');
-  await page.locator('#piece-count').fill('2');
-  await page.locator('[data-action="cut"]').click(); await page.waitForTimeout(750);
-  await page.locator('[data-action="take"][data-id="0"]').click(); await page.waitForTimeout(750);
+  await fulfill(page);
   const home = await hairCenter();
   assert.ok(home > 730 && home < 800, `Guest did not start at counter: ${home}`);
   await page.locator('[data-action="serve"]').click();
@@ -58,10 +59,11 @@ try {
   const arriving = await hairCenter();
   await screenshot('guest-arriving');
   assert.ok(arriving < home - 150, `Next guest did not enter from left: ${arriving}`);
-  await page.waitForFunction(() => document.querySelector('#bakery').getAttribute('aria-busy') === 'false');
+  await ready(page);
   const settled = await hairCenter();
   assert.ok(Math.abs(settled - home) < 20, `Next guest did not reach counter: ${settled}`);
   await screenshot('next-guest');
+  await page.waitForTimeout(350); await screenshot('guest-wave');
   await page.setViewportSize({ width: 390, height: 844 }); await page.waitForTimeout(150);
   await screenshot('plates-mobile');
   assert.deepEqual(errors, []);

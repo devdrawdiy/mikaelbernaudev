@@ -4,7 +4,7 @@ Working game design for a one-page portfolio sample. Proposed defaults below rem
 
 ## Concept
 
-Run a small bakery serving guests. Bring cakes from display case to workbench, divide each into equal pieces, and assemble requested portions. Play with mathematical objects while completing a concrete story task. Working session proposal: serve six guests, then show a simple Play again button; exact guest count remains to be confirmed.
+Run a small bakery serving six guests with randomized names, cake flavors, and quantities. Bring cakes from display case to workbench, divide each into equal pieces, and assemble requested portions. Complete a concrete story task, then show Play again with fresh random orders.
 
 Audience: children aged 7-12. Initial sample makes basic fractions approachable through exploration, without memorization, mastery tests, or a mathematical final exam. Harder modes can come later. Intended session: roughly 3-5 minutes, to be checked through playtesting.
 
@@ -13,7 +13,7 @@ Portfolio goal: demonstrate an engaging completion loop, mathematically faithful
 ## Experience And Victory
 
 - Role: baker serving one guest order at a time.
-- Objective: finish a finite story task, provisionally serving six guests. Ten points is another possible ending; prefer visible guest satisfaction for this standalone sample.
+- Objective: serve six guests, one customer at a time. Visible progress counts deliveries, not mathematical knowledge.
 - Visible progress: guest count tracks completed deliveries, not knowledge demonstrated.
 - Completion: final delivery finishes short round; no celebration sequence, stamp, or elaborate reward screen needed for demo.
 - Ending: simple Play again button resets orders, guest progress, tray, cake cuts, and simplification state; all cakes restart whole.
@@ -32,13 +32,13 @@ Completion comes from helping guests. Matching portions gives actions meaning wi
 
 One third means one piece of a whole divided into three equal pieces; two thirds means two such pieces. More divisions are mathematically possible, but sample stops at twelfths to keep pieces usable. All cakes share the same whole size; flavor quantities remain separate.
 
-No fraction addition, repeated same-flavor sums, or harder final challenge in proof of concept. Combining an order means placing portions of different cakes on one tray. Playtesting should focus on enjoyment, willingness to experiment, and whether visual relationships are clear.
+Requests always include a fractional part, optionally with up to three whole cakes of each flavor: `3 and 1/12` is valid, `3 cakes` alone is not generated. Whole cakes and fractional portions combine visually without requiring written fraction addition. All requested flavors together must fit seven plates.
 
 ### Optional Simplification
 
 Simplification physically merges pieces of the same flavor when numerator and denominator share a factor greater than one: `3/12 -> 1/4` merges three twelfths into one quarter; `6/8 -> 3/4` merges six eighths into three quarters. Divide numerator and denominator by their greatest common divisor, grouping that many original slices per merged piece. Quantity and flavor stay unchanged; simplification never gates delivery or story progress.
 
-Confirmed trigger: a Simplify button for each flavor's tray portion, available only when that nonempty portion is reducible. One tap animates physical merging and updates fraction label and visible piece count together; pieces may reshape without physical realism. Keep whole reference visible and retain original slice identities: returning a merged piece splits it back into source slices. Source cake keeps its existing partition.
+Confirmed trigger: a Simplify button per flavor, available if any of that flavor's plates contains a reducible portion. Merge separately within each original cake; never mix flavors or merge across cake identities. Preserve original slice identities so returning a merged piece restores its source partition. Visible totals retain their current common denominator until pieces are simplified.
 
 ## Screen And Art Direction
 
@@ -46,7 +46,7 @@ One full-screen bakery scene, immediately playable. Fixed camera presents counte
 
 - Upper area: current customer and short order ticket, with stacked fraction notation and cake icons.
 - Middle: focused cake, numeric piece-count field with minus/plus buttons, and cut action; whole-cake reference always visible. Count can be typed or adjusted with counter widget.
-- Lower area: serving tray with a separate cake-shaped group for each flavor, each with its quantity label and Simplify button, plus serve control. Simplify is unavailable when portion is empty or already irreducible.
+- Lower area: seven nonoverlapping plates, each reserved for portions from one cake. Flavor totals use mixed-number notation; plate numbers identify return controls. Whole cakes can transfer in one tap, and cake selectors switch between existing batches of the current flavor.
 - Progress: compact guest count stays visible without obscuring workbench.
 - Display case: three recognizable cake types, provisionally lemon, chocolate, and cheesecake, distinguished by decoration, name, and color.
 
@@ -61,11 +61,11 @@ Art: stylized tactile cakes, clear frosting layers, readable slice boundaries, a
 5. Tap a piece to transfer it to serving tray. Its position smoothly interpolates from cake to tray; current quantity updates with transfer. Tapping a tray piece animates it back to cake.
 6. Switch flavors as needed. Previous cake closes and returns to display case, preserving missing pieces.
 7. Press serve. Correct tray becomes a delivery; incorrect tray stays editable with specific feedback.
-8. Cake portions fly out to the right; satisfied guest follows. Delivery count advances and next guest enters from the left. Fresh cakes appear for next order; final guest leaves before Play again appears.
+8. Cake portions fly right; satisfied guest follows. Next guest enters from the left and waves with their left arm after reaching the counter. Fresh cakes appear for the next order; final guest leaves before Play again appears. Reduced motion omits travel and waving.
 
 Tap-to-transfer is confirmed for demo; dragging is a future extension. Reserve slice and its destination when tapped, allowing only one transfer per slice at a time. Animate position independently of quantity validation; every transfer remains reversible once movement finishes. Reduced motion uses immediate placement.
 
-Every fresh cake starts as one visibly intact whole. Editing count proposes a division; cut action commits it. Empty, noninteger, or out-of-range input must not cut cake. Previously used cakes retain missing pieces within current order; fresh wholes appear for next guest.
+Every fresh cake starts intact. Emptying a cake or transferring it whole brings in another whole cake of that flavor. Editing count alone never commits a cut; invalid counts are rejected. Previously used cakes keep their identities and partitions, and returning a portion brings its original cake into focus.
 
 ## Cake Unfurling
 
@@ -75,7 +75,7 @@ Slice positions follow a spline from assembled circle to spread arrangement. Eac
 
 Use a fixed focus scale for every denominator. Changing from four to three pieces should visibly produce fewer, larger wedges belonging to the same whole. Labels show `1/4` or `1/3` on pieces; selected quantity can show `2/3` beside tray.
 
-After transfer, empty positions remain visible in whole reference. Returning cake to shelf must retain gaps; replenishment happens only after successful delivery. This preserves conservation of cake within each order.
+After transfer, the source partition remains recoverable through cake selectors and return controls. A fully transferred cake stays on its reserved plate while a separate fresh cake replenishes the shelf. Replenishment never changes the amount already served onto the tray.
 
 ### Procedural Cake Construction
 
@@ -85,9 +85,9 @@ Share geometry and materials within each partition. Flavor comes from sponge, fi
 
 ## Partition And Undo Rules
 
-- Each flavor has one whole cake available per order; sample requests never exceed one whole of any flavor.
+- Each flavor has a focused cake and may have multiple older cakes on the tray. Up to seven source cakes reserve seven separate plates; transferring more pieces into an existing reserved plate remains possible when the tray is full.
 - Before transfer, player can change count and cut again to explore divisions. Each cut partitions the same whole, preserving cake radius, height, and total quantity.
-- After transfer, player can edit count and cut again. Cut first returns all tray pieces of that flavor, visibly reassembles whole, then applies new division. Other flavors stay on tray; editing input alone never returns pieces.
+- Recutting returns only the focused cake's portions before applying the new division. Other cakes, including those of the same flavor, remain on the tray. Cake selectors and return controls choose which source cake is focused.
 - Returning a piece restores its original wedge position and subtracts its exact quantity from tray. A merged piece returns all slices it represents, splitting back into source partition; recutting likewise restores original slices before creating new division.
 - Clear-tray control returns every piece; switching cake never clears tray or loses progress.
 - Serve compares total amount of each flavor against request, accepting mathematically equivalent partitions.
@@ -96,7 +96,7 @@ Share geometry and materials within each partition. Flavor comes from sponge, fi
 
 Example: guest requests `2/3` lemon, half chocolate, and `1/8` cheesecake. Player transfers each portion to same tray. Half chocolate can be one half or two quarters; no written calculation or explanation is required.
 
-## Proposed Six-Guest Session
+## Random Six-Guest Session
 
 | Guest | Customer request | Interaction variety | Visible outcome |
 | --- | --- | --- | --- |
@@ -107,9 +107,9 @@ Example: guest requests `2/3` lemon, half chocolate, and `1/8` cheesecake. Playe
 | 5 | `3/5` lemon | Explore another partition | Fifth delivery completed |
 | 6 | `2/3` lemon, `1/2` chocolate, `1/8` cheesecake | Assemble three-flavor order | Round ends; Play again appears |
 
-These are proposed orders, not a curriculum or difficulty ladder. Final guest is another bakery order, not a knowledge test. All supported partitions remain available for exploration throughout session.
+The table gives illustrative simple requests, not fixed assignments or a curriculum. Actual guests, selected flavors, and amounts are randomized. Final guest is another bakery order, not a knowledge test. All partitions remain available throughout the session.
 
-Initial session uses authored orders for reliable pacing. Replay repeats them with fresh state. More order sets belong after first sample works.
+Random requests favor denominators 6-12 and choose a single fractional slice about 65% of the time, while still including larger fractions. Whole-number components use weights 16:5:2:1 for 0:1:2:3, constrained by the remaining plate budget. Every flavor keeps a nonzero fractional remainder; replay generates fresh requests.
 
 ## Feedback And Help
 
@@ -141,7 +141,7 @@ Optional polish: recorded customer voices, gentle sound effects, expressive gues
 
 ## Validation And Working Defaults
 
-- Mathematical checks: partitions have equal pieces; simplification merges correct same-flavor groups without changing amount; merged-piece undo restores original slices; equivalent fractions accepted; recutting restores whole cake and preserves other flavors.
+- Mathematical checks: equivalent and mixed amounts validate exactly; simplification and undo conserve quantity; recutting preserves other source cakes; random orders always include fractions, stay below four whole cakes per flavor, and fit seven plates.
 - Interaction checks: complete session with mouse, touch, and keyboard; replay resets everything; fast taps cannot duplicate slices or deliveries; resize preserves order state.
 - Visual checks: inspect desktop and mobile views; wedges and labels remain readable; no overlapping controls; 3D canvas renders visible cakes; reduced motion remains playable.
 - Playtest observations: does player experiment with divisions, enjoy moving portions, recover comfortably from mismatches, and notice changing piece sizes? No explanation or knowledge demonstration required to finish.
