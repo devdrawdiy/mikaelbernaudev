@@ -30,7 +30,7 @@ Reducible portions pulse gently. Simplify opens an optional translucent equation
 - `cake-mesh.ts`, `positions.ts`, `motion.ts`: shared wedge geometry, invisible spline layout, interpolation.
 - `room.ts`, `props.ts`, `guest.ts`, `guest-greeting.ts`: kitchen, supplied CoffeeShopStarterPack props, procedural guest and arrival greeting.
 
-Cake geometry is procedural; no Unity runtime is required. Starter-pack artwork remains subject to its asset license. Keep the Unity source pack out of any public asset download distribution.
+Cake geometry is procedural; no Unity runtime is required. The demo uses six FBX props, their shared palette texture, and three cake preview images. The original PDF manual is retained for reference. Starter-pack artwork remains subject to its asset license. Keep the Unity source pack out of any public asset download distribution.
 
 ## Checks
 

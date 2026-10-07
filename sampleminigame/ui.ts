@@ -3,7 +3,11 @@ import { fraction, icon, quantity } from './quantity-ui';
 import { renderTray } from './tray-ui';
 import { cakeName, t } from './i18n';
 import { renderLocale } from './locale-ui';
-const previews = import.meta.glob('./CoffeeShopStarterPack/Test/ScreenShots/PW_cheesecake*.png', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+const previews = import.meta.glob([
+  './CoffeeShopStarterPack/Test/ScreenShots/PW_cheesecake_chocolatte.png',
+  './CoffeeShopStarterPack/Test/ScreenShots/PW_cheesecake_lime.png',
+  './CoffeeShopStarterPack/Test/ScreenShots/PW_cheesecake_strawberry.png',
+], { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 export class BakeryUI {
   root = document.querySelector<HTMLElement>('#bakery')!;
   input = document.querySelector<HTMLInputElement>('#piece-count')!;
