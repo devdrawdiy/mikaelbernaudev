@@ -1,5 +1,5 @@
 import { flavors, plateCapacity, type Flavor, type Fraction } from './catalog.ts';
-import { add, gcd } from './fractions.ts';
+import { add, gcd, validDivisor } from './fractions.ts';
 export type Cake = { id: number; division: number; selected: boolean[]; groupSize: number; plate: number | null };
 export type Portion = { cakeId: number; ids: number[]; denominator: number; sourceDivision: number; plate: number; index: number };
 
@@ -83,9 +83,7 @@ export class CakeInventory {
   canSimplify(id: Flavor) { return this.simplifiable(id).length > 0; }
   simplify(id: Flavor, cakeId: number, divisor: number) {
     const cake = this.cake(id, cakeId);
-    if (!cake || !this.reducible(cake) || !Number.isInteger(divisor) || divisor < 2) return false;
-    const { numerator, denominator } = this.fraction(cake);
-    if (numerator % divisor || denominator % divisor) return false;
+    if (!cake || !this.reducible(cake) || !validDivisor(this.fraction(cake), divisor)) return false;
     cake.groupSize *= divisor;
     return true;
   }

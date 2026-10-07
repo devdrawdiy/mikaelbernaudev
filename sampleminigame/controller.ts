@@ -2,15 +2,21 @@ import { Bakery, type Flavor } from './domain';
 import { BakeryScene, type Selection } from './scene';
 import { BakeryUI } from './ui';
 import { Simplification } from './simplification';
+import { cakeName, describeQuantity, setLanguage, t, tText } from './i18n';
 export class Controller {
   state = new Bakery(); ui = new BakeryUI();
   scene: BakeryScene;
-  simplification = new Simplification(this.state, () => { this.ui.say('Same amount of cake. One star earned!', 'success'); this.chime(880); this.refresh(); });
+  simplification = new Simplification(this.state, () => { this.ui.say(() => t('rewardMessage'), 'success'); this.chime(880); this.refresh(); });
   spread = false; locked = false; muted = true;
   sound?: AudioContext;
   disposed = false;
   constructor(canvas: HTMLCanvasElement) {
     this.scene = new BakeryScene(canvas);
+    this.ui.root.addEventListener('change', async (event) => {
+      const picker = event.target as HTMLSelectElement;
+      if (!picker.matches('[data-language-picker]') || !await setLanguage(picker.value)) return;
+      this.ui.render(this.state, this.spread, this.locked, this.muted); this.simplification.localize();
+    });
     this.ui.root.addEventListener('click', (event) => {
       const button = (event.target as HTMLElement).closest<HTMLElement>('[data-action]');
       if (button && !(button as HTMLButtonElement).disabled) this.action(button);
@@ -21,7 +27,7 @@ export class Controller {
     document.querySelector('#cut-form')!.addEventListener('submit', (event) => { event.preventDefault(); this.cut(); });
     this.refresh();
   }
-  refresh() { this.ui.render(this.state, this.spread, this.locked); this.scene.sync(this.state, this.spread); }
+  refresh() { this.ui.render(this.state, this.spread, this.locked, this.muted); this.scene.sync(this.state, this.spread); }
   action(button: HTMLElement) {
     const { action, flavor, id, ids, cake } = button.dataset;
     if (action === 'sound') return this.toggleSound(button);
@@ -53,13 +59,13 @@ export class Controller {
         this.ui.select(this.state.active, this.state.cakes[this.state.active].division);
       }
       this.ui.say(''); this.chime(520); this.refresh();
-    } else if (!selection.tray && this.state.trayFull) this.ui.say('All seven plates are in use. Return a portion to free a plate.');
+    } else if (!selection.tray && this.state.trayFull) this.ui.say(() => t('fullTray'));
   }
   async cut() {
     if (this.locked || this.state.complete) return;
     const count = Number(this.ui.input.value);
     if (!Number.isInteger(count) || count < 2 || count > 12) {
-      this.ui.input.setCustomValidity('Choose a whole number from 2 to 12.'); this.ui.input.reportValidity(); return;
+      this.ui.input.setCustomValidity(t('invalidPieces')); this.ui.input.reportValidity(); return;
     }
     this.ui.pending[this.state.active] = count;
     const cake = this.state.cakes[this.state.active];
@@ -73,9 +79,10 @@ export class Controller {
   }
   async serve() {
     const mismatch = this.state.mismatch();
-    if (mismatch) { this.ui.say(mismatch); return; }
-    this.locked = true; this.ui.say(`Thank you! ${this.state.order.guest}'s cake is ready.`, 'success');
-    this.ui.render(this.state, this.spread, this.locked); this.chime(780);
+    if (mismatch) { this.ui.say(() => tText(mismatch.kind, { guest: this.state.order.guest, cake: cakeName(mismatch.flavor), amount: describeQuantity(mismatch.amount), requested: mismatch.requested ? describeQuantity(mismatch.requested) : '' })); return; }
+    const guest = this.state.order.guest;
+    this.locked = true; this.ui.say(() => t('thanks', { guest }), 'success');
+    this.ui.render(this.state, this.spread, this.locked, this.muted); this.chime(780);
     this.scene.flyOrderRight();
     await this.pause(180);
     if (this.disposed) return;
@@ -85,15 +92,15 @@ export class Controller {
     this.ui.select(this.state.active); this.refresh();
     if (!this.state.complete) await this.scene.guestEntrance();
     if (this.disposed) return;
-    this.locked = false; this.ui.say(''); this.ui.render(this.state, this.spread, this.locked);
+    this.locked = false; this.ui.say(''); this.ui.render(this.state, this.spread, this.locked, this.muted);
   }
   pause(ms: number) { return new Promise<void>((resolve) => setTimeout(resolve, this.scene.motion.reduced ? 0 : ms)); }
   toggleSound(button: HTMLElement) {
     this.muted = !this.muted;
     button.innerHTML = `<i class="fa-solid fa-volume-${this.muted ? 'xmark' : 'high'}" aria-hidden="true"></i>`;
     button.setAttribute('aria-pressed', String(!this.muted));
-    button.setAttribute('aria-label', this.muted ? 'Turn sound on' : 'Turn sound off');
-    button.title = this.muted ? 'Turn sound on' : 'Turn sound off';
+    button.setAttribute('aria-label', t(this.muted ? 'soundOn' : 'soundOff'));
+    button.title = t(this.muted ? 'soundOn' : 'soundOff');
     if (!this.muted) this.chime();
   }
   chime(frequency = 600) {

@@ -1,10 +1,11 @@
-import { flavors, type Flavor, type Order } from './catalog.ts';
-import { compare, describe } from './fractions.ts';
+import { flavors, type Flavor, type Fraction, type Order } from './catalog.ts';
+import { compare } from './fractions.ts';
 import { CakeInventory } from './inventory.ts';
 import { generateOrders } from './orders.ts';
 export { flavors, flavorInfo, plateCapacity, type Flavor, type Request, type Order } from './catalog.ts';
 export { gcd } from './fractions.ts';
 export type { Cake, Portion } from './inventory.ts';
+export type Mismatch = { flavor: Flavor; kind: 'unrequested' | 'tooLittle' | 'tooMuch'; amount: Fraction; requested?: Fraction };
 
 export class Bakery {
   index = 0;
@@ -47,12 +48,12 @@ export class Bakery {
   }
   restoreCurrent() { if (!this.complete) this.inventory.restore(this.cakes[this.active]); }
   clear() { if (!this.complete) this.inventory.clear(); }
-  mismatch(): string | null {
-    for (const { id, name } of flavors) {
+  mismatch(): Mismatch | null {
+    for (const { id } of flavors) {
       const request = this.order.items.find((item) => item.flavor === id), amount = this.amount(id);
-      if (!request && amount.numerator) return `${this.order.guest} didn't order ${name.toLowerCase()} cake.`;
+      if (!request && amount.numerator) return { flavor: id, kind: 'unrequested', amount };
       if (!request || !compare(amount, request)) continue;
-      return `${name}: ${describe(amount)} on the tray; ${describe(request)} requested. ${compare(amount, request) < 0 ? 'A little more, please!' : 'A little less, please!'}`;
+      return { flavor: id, kind: compare(amount, request) < 0 ? 'tooLittle' : 'tooMuch', amount, requested: request };
     }
     return null;
   }

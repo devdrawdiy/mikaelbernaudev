@@ -1,6 +1,10 @@
 export const action = (page, name, flavor) => page.locator(`[data-action="${name}"]${flavor ? `[data-flavor="${flavor}"]` : ''}`);
 export const settle = (page) => page.waitForTimeout(720);
 export const ready = (page) => page.waitForFunction(() => document.querySelector('#bakery').getAttribute('aria-busy') === 'false');
+export async function chooseLanguage(page, language, scope = '.header-tools') {
+  await page.locator(`${scope} [data-language-picker]`).selectOption(language);
+  await page.waitForFunction((value) => document.documentElement.lang === value, language);
+}
 export const requests = (page) => page.locator('#ticket .request').evaluateAll((rows) => rows.map(({ dataset }) => ({ flavor: dataset.flavor, numerator: Number(dataset.numerator), denominator: Number(dataset.denominator) })));
 export async function amount(page, flavor) {
   return page.locator(`.tray-group[data-flavor="${flavor}"] .tray-title strong`).evaluate(({ dataset }) => [Number(dataset.numerator), Number(dataset.denominator)]);
@@ -19,7 +23,7 @@ export async function whole(page, count = 1) {
 }
 export async function simplify(page, flavor, divisor) {
   await action(page, 'simplify', flavor).click();
-  await page.locator('#simplify-divisor').fill(String(divisor));
+  await page.locator(`#simplification input[name="simplify-divisor"][value="${divisor}"]`).check();
   await page.locator('#simplification [type="submit"]').click();
   await page.locator('#simplification [type="submit"]').click(); await settle(page);
 }

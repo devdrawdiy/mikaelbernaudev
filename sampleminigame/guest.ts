@@ -1,14 +1,22 @@
 import * as THREE from 'three';
 
-function sphere(radius: number, color: string) {
-  return new THREE.Mesh(new THREE.SphereGeometry(radius, 12, 10), new THREE.MeshStandardMaterial({ color, roughness: 0.8 }));
+export const skinTones = ['#f0c7aa', '#bf855b', '#633d2b'] as const;
+function sphere(radius: number, color: string | THREE.MeshStandardMaterial) {
+  const material = typeof color === 'string' ? new THREE.MeshStandardMaterial({ color, roughness: 0.8 }) : color;
+  return new THREE.Mesh(new THREE.SphereGeometry(radius, 12, 10), material);
 }
-export function makeGuest() {
+export function randomizeGuestSkin(guest: THREE.Group, random: () => number = Math.random) {
+  const head = guest.getObjectByName('head') as THREE.Mesh<THREE.SphereGeometry, THREE.MeshStandardMaterial>;
+  head.material.color.set(skinTones[Math.min(skinTones.length - 1, Math.floor(random() * skinTones.length))]);
+}
+export function makeGuest(random: () => number = Math.random) {
   const guest = new THREE.Group();
-  const head = sphere(0.38, '#dba987');
+  const skin = new THREE.MeshStandardMaterial({ color: skinTones[0], roughness: 0.8 });
+  const head = sphere(0.38, skin); head.name = 'head';
   head.position.y = 2.58;
   guest.add(head);
   const hair = sphere(0.40, '#533b3d');
+  hair.name = 'hair';
   hair.scale.set(1, 0.65, 1);
   hair.position.set(0, 2.81, -0.055);
   guest.add(hair);
@@ -35,9 +43,11 @@ export function makeGuest() {
     shoulder.rotation.z = x < 0 ? -0.4 : 0.4;
     const arm = new THREE.Mesh(new THREE.CapsuleGeometry(0.095, 0.35, 3, 8), body.material);
     arm.position.y = -0.22;
-    const hand = sphere(0.10, '#dba987'); hand.position.y = -0.49;
+    const hand = sphere(0.10, skin); hand.position.y = -0.49;
+    hand.name = x > 0 ? 'left-hand' : 'right-hand';
     shoulder.add(arm, hand); guest.add(shoulder);
   }
   guest.position.set(0.8, 0, -2.8);
+  randomizeGuestSkin(guest, random);
   return guest;
 }

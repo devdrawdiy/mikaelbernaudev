@@ -11,6 +11,9 @@ export function add(a: Fraction, b: Fraction): Fraction {
 export function compare(a: Fraction, b: Fraction) {
   return a.numerator * b.denominator - b.numerator * a.denominator;
 }
+export function validDivisor({ numerator, denominator }: Fraction, divisor: number | null): divisor is number {
+  return divisor !== null && Number.isInteger(divisor) && divisor >= 2 && numerator > 0 && numerator % divisor === 0 && denominator % divisor === 0;
+}
 export function describe({ numerator, denominator }: Fraction) {
   const whole = Math.floor(numerator / denominator), remainder = numerator % denominator;
   return remainder ? `${whole ? `${whole} and ` : ''}${remainder}/${denominator}` : String(whole);

@@ -1,0 +1,25 @@
+.language-picker { width: 100px; height: 42px; border: 1px solid #c9d9ca; border-radius: 6px; padding: 0 8px; background: #fffdfa; color: #3b6555; font-size: 12px; font-weight: 600; cursor: pointer; }
+.language-picker:focus-visible { outline: 3px solid #b74c70; outline-offset: 4px; }
+.ticket-heading > div { min-width: 0; }
+.ticket h2 { overflow-wrap: anywhere; }
+.cake-choice { height: 124px; }
+.cake-choice span { line-height: 1.2; }
+.tray-title > span { min-width: 0; }
+.tray-title { flex-wrap: wrap; }
+.simplification-heading h2 { min-width: 0; overflow-wrap: anywhere; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .cake-choice { height: 110px; }
+  .topbar { padding: 0 16px; gap: 10px; }
+  .progress-wrap { gap: 10px; }
+  .brand { gap: 8px; }
+  .language-picker { width: 90px; }
+}
+@media (max-width: 760px) {
+  .topbar { display: grid; grid-template-columns: 1fr auto; height: 108px; padding: 8px 14px; gap: 4px 10px; }
+  .brand { grid-column: 1; grid-row: 1; }
+  .progress-wrap { grid-column: 2; grid-row: 1; justify-self: end; }
+  .header-tools { grid-column: 1 / -1; grid-row: 2; align-items: center; }
+  .header-tools .language-picker { margin-right: auto; height: 36px; }
+  .cake-choice { height: 104px; }
+  .tray-title { overflow-wrap: anywhere; }
+}

@@ -65,13 +65,13 @@ test('equivalent fractions and mixed amounts serve six guests', () => {
 test('wrong quantities remain editable, with exact comparison', () => {
   const game = new Bakery({ orders: fixtures });
   game.cut('chocolate', 4); game.take('chocolate', 0);
-  assert.match(game.mismatch()!, /more/);
+  assert.equal(game.mismatch()!.kind, 'tooLittle');
   game.take('chocolate', 1); game.take('chocolate', 2);
-  assert.match(game.mismatch()!, /less/);
+  assert.equal(game.mismatch()!.kind, 'tooMuch');
   const portion = game.portions('chocolate').at(-1)!;
   game.returnPiece('chocolate', portion.ids, portion.cakeId);
   game.take('lemon', 0);
-  assert.match(game.mismatch()!, /didn't order/);
+  assert.equal(game.mismatch()!.kind, 'unrequested');
   const lemon = game.portions('lemon')[0];
   game.returnPiece('lemon', lemon.ids, lemon.cakeId);
   assert.equal(game.mismatch(), null);

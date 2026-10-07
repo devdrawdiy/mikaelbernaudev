@@ -2,7 +2,7 @@ import { dependency } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { action, settle, ready, amount, cut, take, simplify, fulfill } from './driver.mjs';
+import { action, settle, ready, amount, cut, take, simplify, fulfill, chooseLanguage } from './driver.mjs';
 const { chromium } = dependency('playwright'), sharp = dependency('sharp');
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -10,26 +10,30 @@ const errors = [], failures = [], output = new URL('../.checks/', import.meta.ur
 await mkdir(output, { recursive: true });
 page.on('pageerror', (error) => errors.push(error.message));
 page.on('response', (response) => { if (response.status() >= 400) failures.push(response.url()); });
-const dialog = page.locator('#simplification'), divisor = page.locator('#simplify-divisor');
+const dialog = page.locator('#simplification'), choices = dialog.getByRole('radio');
+const divisor = (value) => dialog.getByRole('radio', { name: `Divide by ${value}`, exact: true });
 const confirm = dialog.locator('[type="submit"]'), stars = () => page.locator('#star-counter span').textContent();
 const screenshot = (name) => page.screenshot({ path: fileURLToPath(new URL(name + '.png', output)), fullPage: true });
 try {
   await page.goto('http://localhost:5173/sampleminigame/');
   await page.waitForFunction(() => document.querySelector('canvas').dataset.props === '6');
+  await chooseLanguage(page, 'en');
   assert.equal(await stars(), '0');
   assert.equal(await action(page, 'simplify', 'chocolate').evaluate((button) => getComputedStyle(button).animationName), 'none');
   await cut(page, 'chocolate', 12); await take(page, 3);
   assert.equal(await action(page, 'simplify', 'chocolate').evaluate((button) => getComputedStyle(button).animationName), 'simplify-pulse');
   await action(page, 'simplify', 'chocolate').click();
-  assert.equal(await divisor.evaluate((input) => document.activeElement === input), true);
+  assert.equal(await choices.count(), 4);
+  assert.equal(await dialog.locator('input:checked').count(), 0);
+  assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /divide both numbers by \?/);
   assert.equal(await confirm.isDisabled(), true);
   assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /3\/12/);
-  for (const invalid of ['1', '0', '4', '2.5', '13', '']) {
-    await divisor.fill(invalid); assert.equal(await confirm.isDisabled(), true);
-    await divisor.press('Enter'); assert.equal(await stars(), '0');
+  for (const invalid of await choices.evaluateAll((inputs) => inputs.map((input) => Number(input.value)).filter((value) => value !== 3))) {
+    await divisor(invalid).check(); assert.equal(await confirm.isDisabled(), true);
+    await divisor(invalid).press('Enter'); assert.equal(await stars(), '0');
   }
-  await divisor.fill('2'); await dialog.locator('[data-simplification="plus"]').click();
-  assert.equal(await divisor.inputValue(), '3'); assert.equal(await confirm.isEnabled(), true);
+  await divisor(3).focus(); await page.keyboard.press('Space');
+  assert.equal(await divisor(3).isChecked(), true); assert.equal(await confirm.isEnabled(), true);
   await screenshot('simplify-equation');
   await page.keyboard.press('Escape'); assert.equal(await dialog.isVisible(), false);
   assert.deepEqual(await amount(page, 'chocolate'), [3, 12]); assert.equal(await stars(), '0');
@@ -42,8 +46,8 @@ try {
   await simplify(page, 'chocolate', 2); assert.deepEqual(await amount(page, 'chocolate'), [3, 6]);
   assert.equal(await action(page, 'return', 'chocolate').count(), 3);
   assert.equal(await action(page, 'simplify', 'chocolate').isEnabled(), true);
-  await action(page, 'simplify', 'chocolate').click(); await divisor.fill('3'); await divisor.press('Enter');
-  assert.equal(await stars(), '3'); assert.equal(await divisor.isDisabled(), true);
+  await action(page, 'simplify', 'chocolate').click(); await divisor(3).check(); await confirm.focus(); await page.keyboard.press('Enter');
+  assert.equal(await stars(), '3'); assert.equal(await divisor(3).isDisabled(), true);
   assert.deepEqual(await amount(page, 'chocolate'), [1, 2]);
   assert.equal(await action(page, 'return', 'chocolate').count(), 1);
   assert.match(await page.locator('#simplification-reward').textContent(), /\+1 star/);
@@ -55,6 +59,8 @@ try {
   await action(page, 'simplify', 'chocolate').click();
   const plates = page.locator('#simplification-plates button');
   assert.equal(await plates.count(), 2); await plates.last().click();
+  assert.equal(await dialog.locator('input:checked').count(), 0);
+  assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /divide both numbers by \?/);
   assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /4\/8/);
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 844 }); await settle(page);
@@ -65,7 +71,7 @@ try {
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Page overflow at ' + width);
     await screenshot('simplify-' + width);
   }
-  await confirm.click(); await confirm.click(); await settle(page);
+  await divisor(2).check(); await confirm.click(); await confirm.click(); await settle(page);
   assert.equal(await stars(), '4');
   const platePortions = page.locator('.tray-group[data-flavor="chocolate"] .plate-portions');
   assert.equal(await platePortions.first().locator('button').count(), 12);
@@ -92,5 +98,5 @@ try {
   for (let i = 0; i < data.length; i += info.channels * 37) colors.add([data[i] >> 3, data[i + 1] >> 3, data[i + 2] >> 3].join(':'));
   assert.ok(colors.size > 100, 'Blank 3D canvas');
   assert.deepEqual(errors, []); assert.deepEqual(failures, []);
-  console.log('Simplification: pulse, live equation, invalid divisors, cancel, keyboard, partial merges, plate selection, stars, session/replay, mobile, reduced motion: PASS');
+  console.log('Simplification: question-mark start, multiple choices, invalid answers, pulse, live equation, cancel, keyboard, partial merges, plate selection, stars, session/replay, mobile, reduced motion: PASS');
 } finally { await browser.close(); }

@@ -1,44 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Little Slice - Fraction Bakery</title>
+      <title>Kafé Tårtbiten - Bakverk och bråk</title>
       <link rel="icon" href="data:," />
       <link rel="stylesheet" href="./style.css" />
       <link rel="stylesheet" href="./responsive.css" />
       <link rel="stylesheet" href="./simplification.css" />
+      <link rel="stylesheet" href="./locale.css" />
    </head>
    <body>
       <div id="bakery">
         <header class="topbar">
-          <div class="brand"><span class="brand-mark"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i></span><div><h1>Little Slice</h1><span>FRACTION BAKERY</span></div></div>
+          <div class="brand"><span class="brand-mark"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i></span><div><h1 data-i18n="brand">Kafé Tårtbiten</h1><span data-i18n="subtitle">Bakverk och bråk</span></div></div>
           <div class="progress-wrap"><div class="session-totals"><span id="guest-counter">0 / 6 guests</span><span class="stars" id="star-counter" role="status" aria-label="0 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span>0</span></span></div><div id="progress" aria-hidden="true"></div></div>
-          <div class="header-tools"><button class="icon-button" data-action="replay" aria-label="Start again" title="Start again"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button><button class="icon-button" data-action="sound" aria-label="Turn sound on" aria-pressed="false" title="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button></div>
+          <div class="header-tools"><select class="language-picker" data-language-picker aria-label="Språk"><option value="sv">Svenska</option><option value="en">English</option></select><button class="icon-button" data-action="replay" data-i18n-label="startAgain" data-i18n-title="startAgain" aria-label="Börja om" title="Börja om"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button><button class="icon-button" data-action="sound" aria-label="Slå på ljud" aria-pressed="false" title="Slå på ljud"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button></div>
         </header>
         <main class="board">
-          <div class="stage"><canvas id="game" aria-label="3D bakery with cakes and serving tray"></canvas></div>
-          <section class="ticket" id="ticket" aria-label="Customer order"></section>
-          <nav class="cake-menu" id="cake-menu" aria-label="Choose cake flavor"></nav>
-          <div class="focus-label"><h2 id="focus-name">Chocolate cake</h2><div id="focus-fraction">One whole cake</div></div>
-          <section class="cutting" aria-label="Cut cake">
-            <nav id="cake-batches" aria-label="Choose a cake"></nav>
-            <form id="cut-form"><label for="piece-count">Equal pieces</label><div class="cut-tools"><div class="counter"><button type="button" data-action="minus" aria-label="Fewer pieces" title="Fewer pieces"><i class="fa-solid fa-minus" aria-hidden="true"></i></button><input id="piece-count" type="number" min="2" max="12" step="1" value="4" inputmode="numeric" required /><button type="button" data-action="plus" aria-label="More pieces" title="More pieces"><i class="fa-solid fa-plus" aria-hidden="true"></i></button></div><button type="submit" class="cut-button" data-action="cut"><i class="fa-solid fa-scissors" aria-hidden="true"></i>Cut</button><button type="button" class="icon-button" data-action="spread" aria-label="Spread pieces" title="Spread pieces"><i class="fa-solid fa-expand" aria-hidden="true"></i></button><button type="button" class="icon-button" data-action="whole" aria-label="Move whole cake to tray" title="Move whole cake to tray"><i class="fa-solid fa-cake-candles" aria-hidden="true"></i></button></div></form>
-            <div id="available-pieces" class="available-pieces" aria-label="Cake pieces"></div>
+          <div class="stage"><canvas id="game" data-i18n-label="canvas" aria-label="3D-café med tårtor och serveringsbricka"></canvas></div>
+          <section class="ticket" id="ticket" data-i18n-label="customerOrder" aria-label="Gästens beställning"></section>
+          <nav class="cake-menu" id="cake-menu" data-i18n-label="chooseFlavor" aria-label="Välj tårtsort"></nav>
+          <div class="focus-label"><h2 id="focus-name">Chokladtårta</h2><div id="focus-fraction">En hel tårta</div></div>
+          <section class="cutting" data-i18n-label="cutCake" aria-label="Dela tårtan">
+            <nav id="cake-batches" data-i18n-label="chooseCake" aria-label="Välj en tårta"></nav>
+            <form id="cut-form" novalidate>
+              <label for="piece-count" data-i18n="equalPieces">Lika stora bitar</label>
+              <div class="cut-tools">
+                <div class="counter"><button type="button" data-action="minus" data-i18n-label="fewerPieces" data-i18n-title="fewerPieces" aria-label="Färre bitar" title="Färre bitar"><i class="fa-solid fa-minus" aria-hidden="true"></i></button><input id="piece-count" type="number" min="2" max="12" step="1" value="4" inputmode="numeric" required /><button type="button" data-action="plus" data-i18n-label="morePieces" data-i18n-title="morePieces" aria-label="Fler bitar" title="Fler bitar"><i class="fa-solid fa-plus" aria-hidden="true"></i></button></div>
+                <button type="submit" class="cut-button" data-action="cut"><i class="fa-solid fa-scissors" aria-hidden="true"></i><span data-i18n="cut">Dela</span></button>
+                <button type="button" class="icon-button" data-action="spread" aria-label="Sprid ut bitarna" title="Sprid ut bitarna"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
+                <button type="button" class="icon-button" data-action="whole" data-i18n-label="wholeToTray" data-i18n-title="wholeToTray" aria-label="Lägg hela tårtan på brickan" title="Lägg hela tårtan på brickan"><i class="fa-solid fa-cake-candles" aria-hidden="true"></i></button>
+              </div>
+            </form>
+            <div id="available-pieces" class="available-pieces" data-i18n-label="cakePieces" aria-label="Tårtbitar"></div>
           </section>
-          <section class="serving" aria-label="Serving tray"><div class="serving-heading"><div><h2>Your tray</h2><span id="plate-counter">0 / 7 plates</span></div><button class="icon-button" data-action="clear" aria-label="Return all pieces" title="Return all pieces"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button></div><div id="tray-portions"></div></section>
-          <div class="delivery"><p id="message" role="status" aria-live="polite"></p><button class="serve-button" data-action="serve"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i>Serve order</button></div>
+          <section class="serving" data-i18n-label="servingTray" aria-label="Serveringsbricka"><div class="serving-heading"><div><h2 data-i18n="tray">Din bricka</h2><span id="plate-counter">0 / 7 tallrikar</span></div><button class="icon-button" data-action="clear" data-i18n-label="clearTray" data-i18n-title="clearTray" aria-label="Lägg tillbaka alla bitar" title="Lägg tillbaka alla bitar"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button></div><div id="tray-portions"></div></section>
+          <div class="delivery"><p id="message" role="status" aria-live="polite"></p><button class="serve-button" data-action="serve"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i><span data-i18n="serve">Servera</span></button></div>
         </main>
-        <dialog id="ending" aria-labelledby="ending-title"><span class="ending-mark"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2 id="ending-title">Everyone has cake!</h2><p class="stars" id="ending-stars"></p><button class="serve-button" data-action="replay"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Play again</button></dialog>
+        <dialog id="ending" aria-labelledby="ending-title"><span class="ending-mark"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2 id="ending-title" data-i18n="ending">Alla har fått tårta!</h2><p class="stars" id="ending-stars"></p><button class="serve-button" data-action="replay"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i><span data-i18n="replay">Spela igen</span></button></dialog>
         <dialog id="simplification" aria-labelledby="simplification-title" aria-describedby="simplification-feedback">
-          <div class="simplification-heading"><h2 id="simplification-title">Simplify</h2><button type="button" class="icon-button" data-simplification="close" aria-label="Close simplification" title="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
-          <nav id="simplification-plates" aria-label="Choose plate to simplify"></nav>
+          <div class="simplification-heading"><h2 id="simplification-title">Förenkla</h2><button type="button" class="icon-button" data-simplification="close" data-i18n-label="closeSimplification" data-i18n-title="close" aria-label="Stäng förenklingen" title="Stäng"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+          <nav id="simplification-plates" data-i18n-label="choosePlate" aria-label="Välj tallrik att förenkla"></nav>
           <form novalidate>
-            <div id="simplification-equation" role="img" aria-label="Fraction equation"></div>
-            <label for="simplify-divisor">Divide by</label>
-            <div class="counter divisor-counter"><button type="button" data-simplification="minus" aria-label="Smaller divisor" title="Smaller divisor"><i class="fa-solid fa-minus" aria-hidden="true"></i></button><input id="simplify-divisor" type="number" min="2" max="12" step="1" value="2" inputmode="numeric" required /><button type="button" data-simplification="plus" aria-label="Larger divisor" title="Larger divisor"><i class="fa-solid fa-plus" aria-hidden="true"></i></button></div>
+            <div id="simplification-equation" role="img" aria-label="Likhet med bråk"></div>
+            <fieldset id="simplification-choices"><legend data-i18n="divideBy">Dela med</legend><div class="divisor-options"></div></fieldset>
             <p id="simplification-feedback" role="status"></p><div id="simplification-reward" class="stars" aria-live="polite"></div>
-            <button type="submit" class="serve-button"><i class="fa-solid fa-object-group" aria-hidden="true"></i>Join pieces</button>
+            <button type="submit" class="serve-button"><i class="fa-solid fa-object-group" aria-hidden="true"></i>Slå ihop bitar</button>
           </form>
         </dialog>
       </div>

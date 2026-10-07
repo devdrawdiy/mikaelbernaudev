@@ -1,7 +1,7 @@
 import { flavors, guestCount, plateCapacity, type Order, type Request } from './catalog.ts';
+import { guestNames } from './guest-names.ts';
 
 type Random = () => number;
-const guests = ['Mia', 'Leo', 'Ivy', 'Sam', 'Noor', 'Alex'];
 function weighted<T>(choices: [T, number][], random: Random): T {
   let value = random() * choices.reduce((sum, [, weight]) => sum + weight, 0);
   for (const [choice, weight] of choices) { value -= weight; if (value < 0) return choice; }
@@ -23,7 +23,7 @@ function quantity(flavor: Request['flavor'], budget: number, random: Random): Re
   return { flavor, numerator: whole * denominator + numerator, denominator };
 }
 export function generateOrders(random: Random = Math.random): Order[] {
-  return shuffled(guests, random).slice(0, guestCount).map((guest) => {
+  return shuffled(guestNames, random).slice(0, guestCount).map((guest) => {
     const count = weighted<number>([[1, 6], [2, 3], [3, 1]], random);
     const selected = shuffled(flavors, random).slice(0, count);
     let remaining = plateCapacity;

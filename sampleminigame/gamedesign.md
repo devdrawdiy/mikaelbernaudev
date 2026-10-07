@@ -1,4 +1,4 @@
-# Fraction Bakery
+# Kafé Tårtbiten
 
 Working game design for a one-page portfolio sample. Proposed defaults below remain open to iteration.
 
@@ -36,21 +36,21 @@ Requests always include a fractional part, optionally with up to three whole cak
 
 ### Optional Simplification
 
-Simplification physically merges pieces of the same flavor when numerator and denominator share a factor greater than one: `3/12 -> 1/4` merges three twelfths into one quarter; `6/8 -> 3/4` merges six eighths into three quarters. A semi-transparent equation overlay offers a typed divisor or minus/plus counter. Player chooses any integer greater than one dividing both numbers exactly; `6/12 -> 3/6 -> 1/2` allows successive merges. Preview updates before committing, without penalties. Each successful merge earns one session star. Quantity and flavor stay unchanged; simplification never gates delivery or story progress.
+Simplification physically merges pieces of the same flavor when numerator and denominator share a factor greater than one: `3/12 -> 1/4` merges three twelfths into one quarter; `6/8 -> 3/4` merges six eighths into three quarters. A semi-transparent equation overlay starts with `divide by ?`, with no answer selected. Up to four randomly ordered divisor choices include at least one valid answer; multiple valid groupings remain available where possible. A choice dividing both numbers exactly enables merging; `6/12 -> 3/6 -> 1/2` allows successive merges. Preview updates before committing, without penalties. Each successful merge earns one session star. Quantity and flavor stay unchanged; simplification never gates delivery or story progress.
 
 Confirmed trigger: a gently pulsing Simplify button per flavor, available if any of that flavor's plates contains a reducible portion. Select one eligible plate in the overlay if several qualify. Merge separately within each original cake; never mix flavors or merge across cake identities. Preserve original slice identities so returning a merged piece restores its source partition. Visible totals retain their current common denominator until pieces are simplified. Closing or cancelling the overlay changes nothing; reduced motion disables pulsing and star animation.
 
 ## Screen And Art Direction
 
-One full-screen bakery scene, immediately playable. Fixed camera presents counter and display case; selecting a cake brings it into a readable close-up without free camera navigation.
+One full-screen bakery scene, immediately playable. Brand: Kafé Tårtbiten; Swedish subtitle: Bakverk och bråk. Swedish is the default; English is selectable only in the top bar, preserving gameplay state. Fixed camera presents counter and display case; selecting a cake brings it into a readable close-up without free camera navigation.
 
 - Upper area: current customer and short order ticket, with stacked fraction notation and cake icons.
 - Middle: focused cake, numeric piece-count field with minus/plus buttons, and cut action; whole-cake reference always visible. Count can be typed or adjusted with counter widget.
 - Lower area: seven nonoverlapping plates, each reserved for portions from one cake. Flavor totals use mixed-number notation; plate numbers identify return controls. Whole cakes can transfer in one tap, and cake selectors switch between existing batches of the current flavor.
 - Progress: compact guest count stays visible without obscuring workbench.
-- Display case: three recognizable cake types, provisionally lemon, chocolate, and cheesecake, distinguished by decoration, name, and color.
+- Display case: lemon, chocolate, and raspberry cake (citrontårta, chokladtårta, and hallontårta), distinguished by decoration, name, and color.
 
-Art: stylized tactile cakes, clear frosting layers, readable slice boundaries, and restrained bakery props. Flavor silhouettes and labels remain distinguishable without color. Use supplied CoffeeShopStarterPack cupboards, displays, plates, appliances, and decorative pastries; match procedural cakes to its low-poly style.
+Art: stylized tactile cakes, clear frosting layers, readable slice boundaries, and restrained bakery props. Flavor silhouettes and labels remain distinguishable without color. Use supplied CoffeeShopStarterPack cupboards, displays, plates, appliances, and decorative pastries; match procedural cakes to its low-poly style. Each new customer independently gets light, medium, or dark skin with equal probability; face and hands match, hair stays unchanged, and appearance remains stable throughout that order.
 
 ## Core Loop
 
@@ -107,7 +107,7 @@ Example: guest requests `2/3` lemon, half chocolate, and `1/8` cheesecake. Playe
 | 5 | `3/5` lemon | Explore another partition | Fifth delivery completed |
 | 6 | `2/3` lemon, `1/2` chocolate, `1/8` cheesecake | Assemble three-flavor order | Round ends; Play again appears |
 
-The table gives illustrative simple requests, not fixed assignments or a curriculum. Actual guests, selected flavors, and amounts are randomized. Final guest is another bakery order, not a knowledge test. All partitions remain available throughout the session.
+The table gives illustrative simple requests, not fixed assignments or a curriculum; cheesecake examples now use raspberry cake. Actual guests, selected flavors, and amounts are randomized. Each session draws six distinct names from 40 (20 female, 20 male), including Ukrainian, English, Syrian, and other international names, independently of skin tone. Final guest is another bakery order, not a knowledge test. All partitions remain available throughout the session.
 
 Random requests favor denominators 6-12. For a denominator N, each fractional numerator from 1 through N-1 is equally likely; there is no extra bias toward 1/N. Whole-number components use weights 16:5:2:1 for 0:1:2:3, constrained by the remaining plate budget. Every flavor keeps a nonzero fractional remainder; replay generates fresh requests.
 
@@ -147,4 +147,4 @@ Optional polish: recorded customer voices, gentle sound effects, expressive gues
 - Playtest observations: does player experiment with divisions, enjoy moving portions, recover comfortably from mismatches, and notice changing piece sizes? No explanation or knowledge demonstration required to finish.
 - Success signal: player enjoys making deliveries, understands story progress, and reaches a distinct ending. Completion measures guests served, not mastery, speed, or memorization.
 - Consensus: playful fraction exploration, intact starting cakes, typed or counter-based cutting, reassembly before recutting, animated tap transfers, separate flavor groups, Simplify button with physical merging, and Play again ending. Enough direction exists to implement demo without further essential questions.
-- Adjustable defaults: six guest orders, denominator cap 12, English text, mouse/touch/keyboard, and gentle mismatch feedback without penalties. Guest appearance remains a presentation choice. Harder modes, dragging, and cross-game progression are future possibilities.
+- Adjustable defaults: six guest orders, denominator cap 12, Swedish text with English choice, mouse/touch/keyboard, and gentle mismatch feedback without penalties. Replay retains language choice; reloading defaults to Swedish. Harder modes, dragging, and cross-game progression are future possibilities.

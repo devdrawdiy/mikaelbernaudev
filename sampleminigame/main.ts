@@ -1,5 +1,6 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Controller } from './controller';
+import { t } from './i18n';
 const canvas = document.querySelector<HTMLCanvasElement>('#game')!;
 let controller: Controller | undefined;
 let animation = 0;
@@ -12,7 +13,7 @@ try {
   };
   animation = requestAnimationFrame(frame);
 } catch (error) {
-  document.querySelector('#message')!.textContent = 'The bakery could not open. Please enable WebGL and refresh.';
+  document.querySelector('#message')!.textContent = t('startupError');
   console.error(error);
 }
 function dispose() { cancelAnimationFrame(animation); controller?.dispose(); }

@@ -2,7 +2,7 @@ import { dependency } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { fulfill, ready } from './driver.mjs';
+import { fulfill, ready, chooseLanguage } from './driver.mjs';
 const { chromium } = dependency('playwright');
 const sharp = dependency('sharp');
 const browser = await chromium.launch({ channel: 'msedge', headless: true });
@@ -26,6 +26,7 @@ async function hairCenter() {
 try {
   await page.goto('http://localhost:5173/sampleminigame/');
   await page.waitForFunction(() => document.querySelector('canvas').dataset.props === '6');
+  await chooseLanguage(page, 'en');
   await page.waitForTimeout(750);
   const layout = await page.evaluate(async () => {
     const { makeRoom } = await import('/sampleminigame/room.ts');

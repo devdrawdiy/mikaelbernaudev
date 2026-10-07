@@ -21,10 +21,16 @@
 #simplification-equation .divided { font-size: 25px; }
 #simplification-equation small { font-size: inherit; color: #a23d61; white-space: nowrap; }
 #simplification-equation .unknown { color: #8a9d91; }
-#simplification form > label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
-.divisor-counter { width: max-content; margin: 0 auto; height: 48px; }
-.divisor-counter button { width: 48px; }
-.divisor-counter input { width: 54px; }
+#simplification-choices { border: 0; padding: 0; margin: 0; min-width: 0; }
+#simplification-choices legend { width: 100%; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.divisor-options { display: flex; justify-content: center; gap: 10px; }
+.divisor-choice { position: relative; cursor: pointer; }
+.divisor-choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.divisor-choice span { width: 48px; height: 48px; display: grid; place-items: center; border: 2px solid #c9d9ca; border-radius: 6px; background: #fffdfa; color: #2c4537; font-size: 22px; font-weight: 700; }
+.divisor-choice:hover span { background: #f1dfed; }
+.divisor-choice input:checked + span { border-color: #b74c70; background: #f1dfed; color: #964366; }
+.divisor-choice input:focus-visible + span { outline: 3px solid #b74c70; outline-offset: 4px; }
+.divisor-choice input:disabled + span { opacity: .6; cursor: default; }
 #simplification-feedback { min-height: 40px; margin: 18px 0 0; font-size: 13px; line-height: 1.4; color: #576d60; }
 #simplification-reward { display: flex; min-height: 36px; margin-bottom: 12px; font-size: 20px; }
 .is-complete #simplification-reward i { animation: star-earned .45s ease-out; }

@@ -2,7 +2,7 @@ import { dependency } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { action, settle, ready, amount, cut, take, whole, fulfill, requests, simplify } from './driver.mjs';
+import { action, settle, ready, amount, cut, take, whole, fulfill, requests, simplify, chooseLanguage } from './driver.mjs';
 const { chromium } = dependency('playwright'), sharp = dependency('sharp');
 const output = new URL('../.checks/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -28,6 +28,7 @@ async function checkCanvas(name) {
 try {
   await page.goto('http://localhost:5173/sampleminigame/');
   await page.waitForFunction(() => document.querySelector('canvas').dataset.props === '6');
+  await chooseLanguage(page, 'en');
   await settle(page); await checkCanvas('Whole cakes');
   const firstTicket = JSON.stringify(await requests(page));
   await cut(page, 'chocolate', 12);
@@ -93,6 +94,7 @@ try {
   assert.deepEqual(await amount(page, 'chocolate'), [2, 4]); await snapshot('desktop');
   await page.emulateMedia({ reducedMotion: 'reduce' }); await page.reload();
   await page.waitForFunction(() => document.querySelector('canvas').dataset.props === '6');
+  await chooseLanguage(page, 'en');
   await fulfill(page); await action(page, 'serve').click();
   await page.waitForFunction(() => document.querySelector('#guest-counter').textContent === '1 / 6 guests');
   console.log('Random six-guest session, mixed cakes, capacity, equivalent fractions, merge/undo, recut, keyboard, replay, reduced motion: PASS');

@@ -3,7 +3,7 @@ import { makeSlice } from './cake-mesh';
 import { Bakery, flavors, type Flavor } from './domain';
 import { Motion } from './motion';
 import { makeRoom } from './room';
-import { makeGuest } from './guest';
+import { makeGuest, randomizeGuestSkin } from './guest';
 import { GuestGreeting } from './guest-greeting';
 import { loadProps } from './props';
 import { cakePose, trayPose, shelfPosition } from './positions';
@@ -105,6 +105,7 @@ export class BakeryScene {
   }
   resetGuest() {
     this.greeting.stop();
+    randomizeGuestSkin(this.guest);
     this.motion.remove(this.guest); this.guest.position.copy(this.guestHome); this.guest.rotation.set(0, 0, 0);
   }
   guestEntrance() {
