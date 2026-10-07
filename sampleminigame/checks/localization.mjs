@@ -35,8 +35,8 @@ try {
   assert.equal(await page.locator('[data-language-picker]').count(), 1);
   assert.equal(await page.locator('dialog [data-language-picker]').count(), 0);
   assert.equal(await page.locator('h1').textContent(), 'Kafé Tårtbiten');
-  assert.equal(await page.locator('[data-i18n="subtitle"]').textContent(), 'Bakverk och bråk');
-  assert.equal(await page.title(), 'Kafé Tårtbiten - Bakverk och bråk');
+  assert.equal(await page.locator('[data-i18n="subtitle"]').textContent(), 'Bak och Bråk');
+  assert.equal(await page.title(), 'Kafé Tårtbiten - Bak och Bråk');
   assert.deepEqual(await page.locator('.cake-choice span').allTextContents(), ['Chokladtårta', 'Citrontårta', 'Hallontårta']);
   assert.equal(await action(page, 'cut').textContent(), 'Dela'); assert.equal(await action(page, 'serve').textContent(), 'Servera');
   assert.equal(await page.locator('.serving h2').textContent(), 'Din bricka');

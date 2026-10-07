@@ -1,5 +1,5 @@
 export const en = {
-  brand: 'Kafé Tårtbiten', subtitle: 'Pastries and fractions', pageTitle: 'Kafé Tårtbiten - Pastries and fractions', language: 'Language',
+  brand: 'Kafé Tårtbiten', subtitle: 'Baking and Fractions', pageTitle: 'Kafé Tårtbiten - Baking and Fractions', language: 'Language',
   cake_chocolate: 'Chocolate cake', cake_lemon: 'Lemon cake', cake_cheesecake: 'Raspberry cake',
   guestProgress: '{{served}} / {{total}} guests', allServed: 'All served', guestNumber: 'Guest {{number}}', orderTitle: "{{guest}}'s order",
   stars: '{{count}} stars', stars_one: '{{count}} star', stars_other: '{{count}} stars', starEarned: '+1 star',

@@ -1,7 +1,7 @@
 import type { en } from './en.ts';
 
 export const sv = {
-  brand: 'Kafé Tårtbiten', subtitle: 'Bakverk och bråk', pageTitle: 'Kafé Tårtbiten - Bakverk och bråk', language: 'Språk',
+  brand: 'Kafé Tårtbiten', subtitle: 'Bak och Bråk', pageTitle: 'Kafé Tårtbiten - Bak och Bråk', language: 'Språk',
   cake_chocolate: 'Chokladtårta', cake_lemon: 'Citrontårta', cake_cheesecake: 'Hallontårta',
   guestProgress: '{{served}} / {{total}} gäster', allServed: 'Alla serverade', guestNumber: 'Gäst {{number}}', orderTitle: 'Beställning: {{guest}}',
   stars: '{{count}} stjärnor', stars_one: '{{count}} stjärna', stars_other: '{{count}} stjärnor', starEarned: '+1 stjärna',

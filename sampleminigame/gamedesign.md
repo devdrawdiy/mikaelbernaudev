@@ -42,7 +42,7 @@ Confirmed trigger: a gently pulsing Simplify button per flavor, available if any
 
 ## Screen And Art Direction
 
-One full-screen bakery scene, immediately playable. Brand: Kafé Tårtbiten; Swedish subtitle: Bakverk och bråk. Swedish is the default; English is selectable only in the top bar, preserving gameplay state. Fixed camera presents counter and display case; selecting a cake brings it into a readable close-up without free camera navigation.
+One full-screen bakery scene, immediately playable. Brand: Kafé Tårtbiten; Swedish subtitle: Bak och Bråk. Swedish is the default; English is selectable only in the top bar, preserving gameplay state. Fixed camera presents counter and display case; selecting a cake brings it into a readable close-up without free camera navigation.
 
 - Upper area: current customer and short order ticket, with stacked fraction notation and cake icons.
 - Middle: focused cake, numeric piece-count field with minus/plus buttons, and cut action; whole-cake reference always visible. Count can be typed or adjusted with counter widget.

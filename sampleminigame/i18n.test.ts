@@ -9,7 +9,7 @@ test('Swedish defaults, complete translation keys, requested cake and control na
   assert.equal(language(), 'sv');
   assert.deepEqual(Object.keys(sv).sort(), Object.keys(en).sort());
   assert.equal(t('brand'), 'Kafé Tårtbiten');
-  assert.equal(t('subtitle'), 'Bakverk och bråk');
+  assert.equal(t('subtitle'), 'Bak och Bråk');
   assert.equal(cakeName('cheesecake'), 'Hallontårta');
   assert.equal(cakeName('lemon'), 'Citrontårta');
   assert.equal(cakeName('chocolate'), 'Chokladtårta');

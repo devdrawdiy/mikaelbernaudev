@@ -4,7 +4,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 const sources = [
   { url: new URL('./CoffeeShopStarterPack/Models/PW_cupboard01.fbx', import.meta.url).href, width: 2.4, x: -4.7, y: 0, z: -3.3 },
   { url: new URL('./CoffeeShopStarterPack/Models/PW_cupboard02.fbx', import.meta.url).href, width: 2.4, x: -2.3, y: 0, z: -3.3 },
-  { url: new URL('./CoffeeShopStarterPack/Models/PW_stove.fbx', import.meta.url).href, width: 1.7, x: 0, y: 0, z: -3.1 },
+  { url: new URL('./CoffeeShopStarterPack/Models/PW_stove.fbx', import.meta.url).href, width: 1.7, x: 0, y: 0, z: -4.1 },
   { url: new URL('./CoffeeShopStarterPack/Models/PW_fridge.fbx', import.meta.url).href, width: 1.5, x: 6.0, y: 0, z: -3.1 },
   { url: new URL('./CoffeeShopStarterPack/Models/PW_macaron_tower.fbx', import.meta.url).href, width: 0.66, x: -5.0, y: 1.61, z: -1.55 },
   { url: new URL('./CoffeeShopStarterPack/Models/PW_sculent01_S.fbx', import.meta.url).href, width: 0.65, x: 5.1, y: 1.61, z: -1.55 },
