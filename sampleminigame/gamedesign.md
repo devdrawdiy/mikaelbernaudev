@@ -16,9 +16,9 @@ Portfolio goal: demonstrate an engaging completion loop, mathematically faithful
 - Objective: serve six guests, one customer at a time. Visible progress counts deliveries, not mathematical knowledge.
 - Visible progress: guest count tracks completed deliveries, not knowledge demonstrated.
 - Completion: final delivery finishes short round; no celebration sequence, stamp, or elaborate reward screen needed for demo.
-- Ending: simple Play again button resets orders, guest progress, tray, cake cuts, and simplification state; all cakes restart whole.
+- Ending: simple Play again button resets orders, guest progress, tray, cake cuts, simplification state, and stars; all cakes restart whole.
 - Errors: recoverable indefinitely; no lives, countdown, public ranking, or penalty for taking time.
-- Rewards: visible delivery, customer response, and completing round. Coins and cross-game upgrades remain outside initial scope.
+- Rewards: visible delivery, customer response, completing round, and optional simplification stars. Stars persist between guests, appear in the ending, and reset on replay. Coins and cross-game upgrades remain outside initial scope.
 
 Completion comes from helping guests. Matching portions gives actions meaning within bakery; it does not measure or certify knowledge. Keep demo ending minimal, with replay as its only action.
 
@@ -36,9 +36,9 @@ Requests always include a fractional part, optionally with up to three whole cak
 
 ### Optional Simplification
 
-Simplification physically merges pieces of the same flavor when numerator and denominator share a factor greater than one: `3/12 -> 1/4` merges three twelfths into one quarter; `6/8 -> 3/4` merges six eighths into three quarters. Divide numerator and denominator by their greatest common divisor, grouping that many original slices per merged piece. Quantity and flavor stay unchanged; simplification never gates delivery or story progress.
+Simplification physically merges pieces of the same flavor when numerator and denominator share a factor greater than one: `3/12 -> 1/4` merges three twelfths into one quarter; `6/8 -> 3/4` merges six eighths into three quarters. A semi-transparent equation overlay offers a typed divisor or minus/plus counter. Player chooses any integer greater than one dividing both numbers exactly; `6/12 -> 3/6 -> 1/2` allows successive merges. Preview updates before committing, without penalties. Each successful merge earns one session star. Quantity and flavor stay unchanged; simplification never gates delivery or story progress.
 
-Confirmed trigger: a Simplify button per flavor, available if any of that flavor's plates contains a reducible portion. Merge separately within each original cake; never mix flavors or merge across cake identities. Preserve original slice identities so returning a merged piece restores its source partition. Visible totals retain their current common denominator until pieces are simplified.
+Confirmed trigger: a gently pulsing Simplify button per flavor, available if any of that flavor's plates contains a reducible portion. Select one eligible plate in the overlay if several qualify. Merge separately within each original cake; never mix flavors or merge across cake identities. Preserve original slice identities so returning a merged piece restores its source partition. Visible totals retain their current common denominator until pieces are simplified. Closing or cancelling the overlay changes nothing; reduced motion disables pulsing and star animation.
 
 ## Screen And Art Direction
 
@@ -69,7 +69,7 @@ Every fresh cake starts intact. Emptying a cake or transferring it whole brings 
 
 ## Cake Unfurling
 
-Treat unfurling as an exploded view of equal wedge slices. Present cake face toward camera so its circular whole and divisions are easy to inspect. Whole-cake outline remains beside or behind expanded pieces.
+Treat unfurling as an exploded view of equal wedge slices. Present cake face toward camera so its circular whole and divisions are easy to inspect. The spline and circular partition guide remain invisible; only cake pieces are rendered.
 
 Slice positions follow a spline from assembled circle to spread arrangement. Each wedge stays rigid, with unchanged area, volume, and fraction value. Animate orientation only as needed for inspection. Do not stretch wedges into bars or let perspective imply unequal portions.
 
@@ -109,7 +109,7 @@ Example: guest requests `2/3` lemon, half chocolate, and `1/8` cheesecake. Playe
 
 The table gives illustrative simple requests, not fixed assignments or a curriculum. Actual guests, selected flavors, and amounts are randomized. Final guest is another bakery order, not a knowledge test. All partitions remain available throughout the session.
 
-Random requests favor denominators 6-12 and choose a single fractional slice about 65% of the time, while still including larger fractions. Whole-number components use weights 16:5:2:1 for 0:1:2:3, constrained by the remaining plate budget. Every flavor keeps a nonzero fractional remainder; replay generates fresh requests.
+Random requests favor denominators 6-12. For a denominator N, each fractional numerator from 1 through N-1 is equally likely; there is no extra bias toward 1/N. Whole-number components use weights 16:5:2:1 for 0:1:2:3, constrained by the remaining plate budget. Every flavor keeps a nonzero fractional remainder; replay generates fresh requests.
 
 ## Feedback And Help
 

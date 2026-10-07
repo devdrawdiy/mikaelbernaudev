@@ -1,0 +1,96 @@
+import { dependency } from './runtime.mjs';
+import { fileURLToPath } from 'node:url';
+import { mkdir } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import { action, settle, ready, amount, cut, take, simplify, fulfill } from './driver.mjs';
+const { chromium } = dependency('playwright'), sharp = dependency('sharp');
+const browser = await chromium.launch({ channel: 'msedge', headless: true });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const errors = [], failures = [], output = new URL('../.checks/', import.meta.url);
+await mkdir(output, { recursive: true });
+page.on('pageerror', (error) => errors.push(error.message));
+page.on('response', (response) => { if (response.status() >= 400) failures.push(response.url()); });
+const dialog = page.locator('#simplification'), divisor = page.locator('#simplify-divisor');
+const confirm = dialog.locator('[type="submit"]'), stars = () => page.locator('#star-counter span').textContent();
+const screenshot = (name) => page.screenshot({ path: fileURLToPath(new URL(name + '.png', output)), fullPage: true });
+try {
+  await page.goto('http://localhost:5173/sampleminigame/');
+  await page.waitForFunction(() => document.querySelector('canvas').dataset.props === '6');
+  assert.equal(await stars(), '0');
+  assert.equal(await action(page, 'simplify', 'chocolate').evaluate((button) => getComputedStyle(button).animationName), 'none');
+  await cut(page, 'chocolate', 12); await take(page, 3);
+  assert.equal(await action(page, 'simplify', 'chocolate').evaluate((button) => getComputedStyle(button).animationName), 'simplify-pulse');
+  await action(page, 'simplify', 'chocolate').click();
+  assert.equal(await divisor.evaluate((input) => document.activeElement === input), true);
+  assert.equal(await confirm.isDisabled(), true);
+  assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /3\/12/);
+  for (const invalid of ['1', '0', '4', '2.5', '13', '']) {
+    await divisor.fill(invalid); assert.equal(await confirm.isDisabled(), true);
+    await divisor.press('Enter'); assert.equal(await stars(), '0');
+  }
+  await divisor.fill('2'); await dialog.locator('[data-simplification="plus"]').click();
+  assert.equal(await divisor.inputValue(), '3'); assert.equal(await confirm.isEnabled(), true);
+  await screenshot('simplify-equation');
+  await page.keyboard.press('Escape'); assert.equal(await dialog.isVisible(), false);
+  assert.deepEqual(await amount(page, 'chocolate'), [3, 12]); assert.equal(await stars(), '0');
+  await simplify(page, 'chocolate', 3);
+  assert.deepEqual(await amount(page, 'chocolate'), [1, 4]); assert.equal(await stars(), '1');
+  assert.equal(await action(page, 'simplify', 'chocolate').isDisabled(), true);
+  assert.equal(await action(page, 'flavor', 'chocolate').evaluate((button) => button === document.activeElement), true);
+  await action(page, 'return', 'chocolate').click(); await settle(page); assert.equal(await stars(), '1');
+  await cut(page, 'chocolate', 12); await take(page, 6);
+  await simplify(page, 'chocolate', 2); assert.deepEqual(await amount(page, 'chocolate'), [3, 6]);
+  assert.equal(await action(page, 'return', 'chocolate').count(), 3);
+  assert.equal(await action(page, 'simplify', 'chocolate').isEnabled(), true);
+  await action(page, 'simplify', 'chocolate').click(); await divisor.fill('3'); await divisor.press('Enter');
+  assert.equal(await stars(), '3'); assert.equal(await divisor.isDisabled(), true);
+  assert.deepEqual(await amount(page, 'chocolate'), [1, 2]);
+  assert.equal(await action(page, 'return', 'chocolate').count(), 1);
+  assert.match(await page.locator('#simplification-reward').textContent(), /\+1 star/);
+  await screenshot('simplify-star'); await page.keyboard.press('Enter'); await settle(page);
+  assert.equal(await dialog.isVisible(), false); assert.equal(await stars(), '3');
+  await action(page, 'clear').click();
+  await cut(page, 'chocolate', 12); await take(page, 12);
+  await cut(page, 'chocolate', 8); await take(page, 4);
+  await action(page, 'simplify', 'chocolate').click();
+  const plates = page.locator('#simplification-plates button');
+  assert.equal(await plates.count(), 2); await plates.last().click();
+  assert.match(await page.locator('#simplification-equation').getAttribute('aria-label'), /4\/8/);
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 844 }); await settle(page);
+    const box = await dialog.boundingBox(), equation = await page.locator('#simplification-equation').boundingBox();
+    assert.ok(box.x >= 0 && box.x + box.width <= width && box.y >= 0 && box.y + box.height <= 844);
+    assert.ok(equation.x >= box.x && equation.x + equation.width <= box.x + box.width);
+    assert.ok(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth), 'Dialog overflow at ' + width);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Page overflow at ' + width);
+    await screenshot('simplify-' + width);
+  }
+  await confirm.click(); await confirm.click(); await settle(page);
+  assert.equal(await stars(), '4');
+  const platePortions = page.locator('.tray-group[data-flavor="chocolate"] .plate-portions');
+  assert.equal(await platePortions.first().locator('button').count(), 12);
+  assert.equal(await platePortions.last().locator('button').count(), 2);
+  await action(page, 'clear').click(); assert.equal(await stars(), '4');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await cut(page, 'chocolate', 4); await take(page, 2);
+  assert.equal(await action(page, 'simplify', 'chocolate').evaluate((button) => getComputedStyle(button).animationName), 'none');
+  await action(page, 'clear').click();
+  for (let i = 0; i < 6; i++) {
+    await fulfill(page); await action(page, 'serve').click(); await ready(page);
+    assert.equal(await stars(), '4');
+  }
+  assert.equal(await page.locator('#ending').isVisible(), true);
+  assert.equal(await page.locator('#ending-stars').textContent(), '4 stars');
+  await page.locator('#ending [data-action="replay"]').click(); await settle(page);
+  assert.equal(await stars(), '0'); assert.equal(await page.locator('#ending-stars').textContent(), '0 stars');
+  await cut(page, 'lemon', 4); await take(page, 2); await simplify(page, 'lemon', 2);
+  assert.equal(await stars(), '1'); await page.locator('.header-tools [data-action="replay"]').click();
+  assert.equal(await stars(), '0');
+  const buffer = await page.locator('canvas').screenshot();
+  const { data, info } = await sharp(buffer).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const colors = new Set();
+  for (let i = 0; i < data.length; i += info.channels * 37) colors.add([data[i] >> 3, data[i + 1] >> 3, data[i + 2] >> 3].join(':'));
+  assert.ok(colors.size > 100, 'Blank 3D canvas');
+  assert.deepEqual(errors, []); assert.deepEqual(failures, []);
+  console.log('Simplification: pulse, live equation, invalid divisors, cancel, keyboard, partial merges, plate selection, stars, session/replay, mobile, reduced motion: PASS');
+} finally { await browser.close(); }

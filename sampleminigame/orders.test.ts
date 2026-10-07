@@ -6,7 +6,8 @@ import { Bakery } from './domain.ts';
 const seeded = (value: number) => () => { value = (Math.imul(value, 1664525) + 1013904223) >>> 0; return value / 4294967296; };
 test('random orders always contain fractions and fit seven plates', () => {
   const random = seeded(1961);
-  let fractions = 0, units = 0, smallPieces = 0, mixed = 0, maxWhole = 0;
+  let fractions = 0, smallPieces = 0, mixed = 0, maxWhole = 0;
+  const numerators = new Map<number, number[]>();
   for (let i = 0; i < 10000; i++) {
     const orders = generateOrders(random);
     assert.equal(orders.length, 6);
@@ -19,14 +20,21 @@ test('random orders always contain fractions and fit seven plates', () => {
         assert.ok(denominator >= 2 && denominator <= 12);
         assert.ok(numerator > 0 && numerator < 4 * denominator);
         assert.notEqual(numerator % denominator, 0, 'Whole-number-only request');
-        fractions++; units += Number(numerator % denominator === 1);
+        fractions++;
+        const counts = numerators.get(denominator) ?? Array(denominator - 1).fill(0);
+        counts[numerator % denominator - 1]++;
+        numerators.set(denominator, counts);
         smallPieces += Number(denominator >= 6);
         mixed += Number(numerator > denominator);
         maxWhole = Math.max(maxWhole, Math.floor(numerator / denominator));
       }
     }
   }
-  assert.ok(units / fractions > 0.6 && units / fractions < 0.85);
+  assert.equal(numerators.size, 11);
+  for (const [denominator, counts] of numerators) {
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    counts.forEach((count, index) => assert.ok(Math.abs(count / total - 1 / (denominator - 1)) < 0.02, `Biased numerator ${index + 1}/${denominator}`));
+  }
   assert.ok(smallPieces / fractions > 0.6 && smallPieces / fractions < 0.8);
   assert.ok(mixed / fractions > 0.2 && mixed / fractions < 0.4);
   assert.equal(maxWhole, 3);

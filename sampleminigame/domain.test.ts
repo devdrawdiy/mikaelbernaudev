@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Bakery, flavors, type Order } from './domain.ts';
-import { compare } from './fractions.ts';
+import { compare, gcd } from './fractions.ts';
 
 const fixtures: Order[] = [
   { guest: 'Mia', items: [{ flavor: 'chocolate', numerator: 1, denominator: 2 }] },
@@ -43,7 +43,7 @@ test('equivalent fractions and mixed amounts serve six guests', () => {
         const multiplier = denominator * 2 <= 12 ? 2 : 1;
         game.cut(flavor, denominator * multiplier);
         for (let i = 0; i < remainder * multiplier; i++) assert.equal(game.take(flavor, i), true);
-        game.simplify(flavor);
+        game.simplify(flavor, game.cakes[flavor].id, gcd(remainder * multiplier, denominator * multiplier));
       }
     }
     assert.equal(game.mismatch(), null);

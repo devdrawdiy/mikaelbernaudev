@@ -8,6 +8,7 @@ export type { Cake, Portion } from './inventory.ts';
 
 export class Bakery {
   index = 0;
+  stars = 0;
   active: Flavor;
   inventory = new CakeInventory();
   orders: Order[];
@@ -39,7 +40,11 @@ export class Bakery {
   }
   portions(id: Flavor) { return this.inventory.portions(id); }
   canSimplify(id: Flavor) { return this.inventory.canSimplify(id); }
-  simplify(id: Flavor) { return !this.complete && this.inventory.simplify(id); }
+  simplify(id: Flavor, cakeId: number, divisor: number) {
+    if (this.complete || !this.inventory.simplify(id, cakeId, divisor)) return false;
+    this.stars++;
+    return true;
+  }
   restoreCurrent() { if (!this.complete) this.inventory.restore(this.cakes[this.active]); }
   clear() { if (!this.complete) this.inventory.clear(); }
   mismatch(): string | null {
@@ -58,7 +63,7 @@ export class Bakery {
     return true;
   }
   replay() {
-    this.index = 0; this.inventory = new CakeInventory(this.inventory.serial);
+    this.index = 0; this.stars = 0; this.inventory = new CakeInventory(this.inventory.serial);
     this.orders = this.options.orders ?? generateOrders(this.options.random);
     this.active = this.order.items[0].flavor;
   }

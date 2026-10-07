@@ -7,12 +7,13 @@
       <link rel="icon" href="data:," />
       <link rel="stylesheet" href="./style.css" />
       <link rel="stylesheet" href="./responsive.css" />
+      <link rel="stylesheet" href="./simplification.css" />
    </head>
    <body>
       <div id="bakery">
         <header class="topbar">
           <div class="brand"><span class="brand-mark"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i></span><div><h1>Little Slice</h1><span>FRACTION BAKERY</span></div></div>
-          <div class="progress-wrap"><span id="guest-counter">0 / 6 guests</span><div id="progress" aria-hidden="true"></div></div>
+          <div class="progress-wrap"><div class="session-totals"><span id="guest-counter">0 / 6 guests</span><span class="stars" id="star-counter" role="status" aria-label="0 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span>0</span></span></div><div id="progress" aria-hidden="true"></div></div>
           <div class="header-tools"><button class="icon-button" data-action="replay" aria-label="Start again" title="Start again"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button><button class="icon-button" data-action="sound" aria-label="Turn sound on" aria-pressed="false" title="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button></div>
         </header>
         <main class="board">
@@ -28,7 +29,18 @@
           <section class="serving" aria-label="Serving tray"><div class="serving-heading"><div><h2>Your tray</h2><span id="plate-counter">0 / 7 plates</span></div><button class="icon-button" data-action="clear" aria-label="Return all pieces" title="Return all pieces"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button></div><div id="tray-portions"></div></section>
           <div class="delivery"><p id="message" role="status" aria-live="polite"></p><button class="serve-button" data-action="serve"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i>Serve order</button></div>
         </main>
-        <dialog id="ending" aria-labelledby="ending-title"><span class="ending-mark"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2 id="ending-title">Everyone has cake!</h2><button class="serve-button" data-action="replay"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Play again</button></dialog>
+        <dialog id="ending" aria-labelledby="ending-title"><span class="ending-mark"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2 id="ending-title">Everyone has cake!</h2><p class="stars" id="ending-stars"></p><button class="serve-button" data-action="replay"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Play again</button></dialog>
+        <dialog id="simplification" aria-labelledby="simplification-title" aria-describedby="simplification-feedback">
+          <div class="simplification-heading"><h2 id="simplification-title">Simplify</h2><button type="button" class="icon-button" data-simplification="close" aria-label="Close simplification" title="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+          <nav id="simplification-plates" aria-label="Choose plate to simplify"></nav>
+          <form novalidate>
+            <div id="simplification-equation" role="img" aria-label="Fraction equation"></div>
+            <label for="simplify-divisor">Divide by</label>
+            <div class="counter divisor-counter"><button type="button" data-simplification="minus" aria-label="Smaller divisor" title="Smaller divisor"><i class="fa-solid fa-minus" aria-hidden="true"></i></button><input id="simplify-divisor" type="number" min="2" max="12" step="1" value="2" inputmode="numeric" required /><button type="button" data-simplification="plus" aria-label="Larger divisor" title="Larger divisor"><i class="fa-solid fa-plus" aria-hidden="true"></i></button></div>
+            <p id="simplification-feedback" role="status"></p><div id="simplification-reward" class="stars" aria-live="polite"></div>
+            <button type="submit" class="serve-button"><i class="fa-solid fa-object-group" aria-hidden="true"></i>Join pieces</button>
+          </form>
+        </dialog>
       </div>
       <script type="module" src="./main.ts"></script>
    </body>

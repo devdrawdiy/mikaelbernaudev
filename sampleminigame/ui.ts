@@ -13,6 +13,9 @@ export class BakeryUI {
     this.root.dataset.complete = String(state.complete); this.root.setAttribute('aria-busy', String(locked));
     const active = flavorInfo(state.active), cake = state.cakes[state.active];
     document.querySelector('#guest-counter')!.textContent = `${state.index} / ${state.orders.length} guests`;
+    const stars = document.querySelector<HTMLElement>('#star-counter')!;
+    stars.querySelector('span')!.textContent = String(state.stars); stars.setAttribute('aria-label', `${state.stars} stars`);
+    document.querySelector('#ending-stars')!.innerHTML = `${icon('star')}<span>${state.stars} ${state.stars === 1 ? 'star' : 'stars'}</span>`;
     document.querySelector('#progress')!.innerHTML = state.orders.map((_, i) => `<span class="${i < state.index ? 'done' : ''}">${i < state.index ? icon('check') : i + 1}</span>`).join('');
     document.querySelector('#ticket')!.innerHTML = `<div class="ticket-heading"><span class="avatar">${state.order.guest[0]}</span><div><span class="eyebrow">${state.complete ? 'All served' : `Guest ${state.index + 1}`}</span><h2>${state.order.guest}'s order</h2></div>${icon('receipt')}</div><div class="request-list">${state.order.items.map((request) => `<div class="request" data-flavor="${request.flavor}" data-numerator="${request.numerator}" data-denominator="${request.denominator}"><span class="flavor-dot" style="--flavor:${flavorInfo(request.flavor).color}"></span>${quantity(request)}<span>${flavorInfo(request.flavor).name}</span></div>`).join('')}</div>`;
     document.querySelector('#cake-menu')!.innerHTML = flavors.map(({ id, name, color, preview }) => `<button class="cake-choice ${id === state.active ? 'active' : ''}" data-action="flavor" data-flavor="${id}" aria-pressed="${id === state.active}" ${locked || state.complete ? 'disabled' : ''} style="--flavor:${color}"><img src="${previews[`./CoffeeShopStarterPack/Test/ScreenShots/${preview}`]}" alt=""/><span>${name}</span></button>`).join('');

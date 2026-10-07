@@ -1,0 +1,40 @@
+.session-totals { display: grid; gap: 5px; }
+.stars { display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 13px; font-weight: 700; color: #785719; }
+.stars i { color: #dcab32; }
+#star-counter { justify-content: flex-start; min-width: 50px; font-variant-numeric: tabular-nums; }
+#ending-stars { display: flex; margin: -10px 0 24px; font-size: 18px; }
+.simplify:not(:disabled) { animation: simplify-pulse 2.4s ease-in-out infinite; }
+@keyframes simplify-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 #b74c7000; background: #f1dfed; }
+  50% { box-shadow: 0 0 0 3px #b74c7024; background: #f5cee4; }
+}
+#simplification { width: 480px; padding: 24px; background: #fafcf6f0; max-height: calc(100svh - 32px); overflow-y: auto; }
+#simplification::backdrop { background: #1e393942; backdrop-filter: none; }
+.simplification-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.simplification-heading h2 { font-size: 22px; margin: 0; text-align: left; }
+.simplification-heading .icon-button { width: 36px; height: 36px; }
+#simplification-plates { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+#simplification-plates:empty { display: none; }
+#simplification-plates .batch-button { width: 48px; height: 40px; }
+#simplification-equation { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 28px 0; min-height: 80px; font-size: 26px; font-weight: 600; }
+#simplification-equation .fraction { font-size: 32px; min-width: 28px; }
+#simplification-equation .divided { font-size: 25px; }
+#simplification-equation small { font-size: inherit; color: #a23d61; white-space: nowrap; }
+#simplification-equation .unknown { color: #8a9d91; }
+#simplification form > label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.divisor-counter { width: max-content; margin: 0 auto; height: 48px; }
+.divisor-counter button { width: 48px; }
+.divisor-counter input { width: 54px; }
+#simplification-feedback { min-height: 40px; margin: 18px 0 0; font-size: 13px; line-height: 1.4; color: #576d60; }
+#simplification-reward { display: flex; min-height: 36px; margin-bottom: 12px; font-size: 20px; }
+.is-complete #simplification-reward i { animation: star-earned .45s ease-out; }
+@keyframes star-earned { from { transform: scale(.65) rotate(-18deg); } to { transform: scale(1) rotate(0); } }
+@media (max-width: 760px) { #star-counter { font-size: 11px; } }
+@media (max-width: 400px) {
+  #simplification { padding: 18px; }
+  .simplification-heading h2 { font-size: 19px; }
+  #simplification-equation { gap: 10px; font-size: 20px; }
+  #simplification-equation .fraction { font-size: 26px; min-width: 24px; }
+  #simplification-equation .divided { font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .simplify, .is-complete #simplification-reward i { animation: none !important; } }

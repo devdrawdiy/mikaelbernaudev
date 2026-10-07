@@ -2,7 +2,7 @@ import { dependency } from './runtime.mjs';
 import { fileURLToPath } from 'node:url';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { action, settle, ready, amount, cut, take, whole, fulfill, requests } from './driver.mjs';
+import { action, settle, ready, amount, cut, take, whole, fulfill, requests, simplify } from './driver.mjs';
 const { chromium } = dependency('playwright'), sharp = dependency('sharp');
 const output = new URL('../.checks/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -34,7 +34,7 @@ try {
   await page.mouse.click(285, 480); await settle(page);
   assert.deepEqual(await amount(page, 'chocolate'), [1, 12]);
   await take(page, 2, 1);
-  await action(page, 'simplify', 'chocolate').click(); await settle(page);
+  await simplify(page, 'chocolate', 3);
   assert.deepEqual(await amount(page, 'chocolate'), [1, 4]);
   await snapshot('merged');
   await action(page, 'return', 'chocolate').click(); await settle(page);
@@ -47,7 +47,7 @@ try {
   await action(page, 'clear').click(); await settle(page);
   await whole(page, 3); await cut(page, 'chocolate', 12); await take(page, 3);
   assert.deepEqual(await amount(page, 'chocolate'), [39, 12]);
-  await action(page, 'simplify', 'chocolate').click(); await settle(page);
+  await simplify(page, 'chocolate', 3);
   assert.deepEqual(await amount(page, 'chocolate'), [13, 4]);
   await action(page, 'return', 'chocolate').last().click(); await settle(page);
   assert.deepEqual(await amount(page, 'chocolate'), [3, 1]);

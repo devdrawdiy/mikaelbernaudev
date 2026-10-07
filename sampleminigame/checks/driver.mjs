@@ -17,6 +17,12 @@ export async function take(page, count, start = 0) {
 export async function whole(page, count = 1) {
   for (let i = 0; i < count; i++) { await action(page, 'whole').click(); await settle(page); }
 }
+export async function simplify(page, flavor, divisor) {
+  await action(page, 'simplify', flavor).click();
+  await page.locator('#simplify-divisor').fill(String(divisor));
+  await page.locator('#simplification [type="submit"]').click();
+  await page.locator('#simplification [type="submit"]').click(); await settle(page);
+}
 export async function fulfill(page, equivalent = true) {
   for (const { flavor, numerator, denominator } of await requests(page)) {
     await action(page, 'flavor', flavor).click(); await settle(page);

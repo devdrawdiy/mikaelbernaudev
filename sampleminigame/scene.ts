@@ -7,7 +7,6 @@ import { makeGuest } from './guest';
 import { GuestGreeting } from './guest-greeting';
 import { loadProps } from './props';
 import { cakePose, trayPose, shelfPosition } from './positions';
-import { CakeReference } from './cake-reference';
 import { buildPlans, type Selection } from './scene-plans';
 export type { Selection } from './scene-plans';
 export class BakeryScene {
@@ -19,7 +18,6 @@ export class BakeryScene {
   guest = makeGuest();
   guestHome = this.guest.position.clone();
   greeting = new GuestGreeting(this.guest);
-  reference = new CakeReference();
   raycaster = new THREE.Raycaster();
   canvas: HTMLCanvasElement;
   observer: ResizeObserver;
@@ -33,7 +31,7 @@ export class BakeryScene {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.3;
     this.scene.background = new THREE.Color('#c5ded4');
-    this.scene.add(makeRoom(), this.guest, this.reference.group, new THREE.HemisphereLight('#fff9ea', '#80988c', 2.6));
+    this.scene.add(makeRoom(), this.guest, new THREE.HemisphereLight('#fff9ea', '#80988c', 2.6));
     const light = new THREE.DirectionalLight('#fff5dc', 3.4);
     light.position.set(-3, 9, 7); light.castShadow = true;
     light.shadow.mapSize.set(2048, 2048);
@@ -54,7 +52,6 @@ export class BakeryScene {
     this.camera.updateProjectionMatrix();
   }
   sync(state: Bakery, spread: boolean) {
-    this.reference.update(state.cakes[state.active], spread);
     const plans = buildPlans(state), keep = new Set(plans.map(({ key }) => key));
     for (const plan of plans) {
       const pose = plan.tray ? trayPose(plan.plate, plan.index, plan.denominator) : cakePose(plan.flavor, plan.index, plan.denominator, state.active, spread);
@@ -121,7 +118,7 @@ export class BakeryScene {
     this.renderer.render(this.scene, this.camera);
   }
   dispose() {
-    this.observer.disconnect(); this.motion.clear(); this.reference.dispose();
+    this.observer.disconnect(); this.motion.clear();
     this.scene.traverse((object) => { if (object instanceof THREE.Mesh) { object.geometry.dispose(); (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material.dispose()); } });
     this.renderer.dispose();
   }

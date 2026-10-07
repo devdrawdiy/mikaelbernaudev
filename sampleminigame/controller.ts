@@ -1,9 +1,11 @@
-import { Bakery, flavorInfo, type Flavor } from './domain';
+import { Bakery, type Flavor } from './domain';
 import { BakeryScene, type Selection } from './scene';
 import { BakeryUI } from './ui';
+import { Simplification } from './simplification';
 export class Controller {
   state = new Bakery(); ui = new BakeryUI();
   scene: BakeryScene;
+  simplification = new Simplification(this.state, () => { this.ui.say('Same amount of cake. One star earned!', 'success'); this.chime(880); this.refresh(); });
   spread = false; locked = false; muted = true;
   sound?: AudioContext;
   disposed = false;
@@ -24,7 +26,7 @@ export class Controller {
     const { action, flavor, id, ids, cake } = button.dataset;
     if (action === 'sound') return this.toggleSound(button);
     if (this.locked) return;
-    if (action === 'replay') { this.state.replay(); this.spread = false; this.scene.resetGuest(); this.scene.greeting.start(this.scene.motion.reduced); this.ui.reset(); this.refresh(); return; }
+    if (action === 'replay') { this.simplification.close(); this.state.replay(); this.spread = false; this.scene.resetGuest(); this.scene.greeting.start(this.scene.motion.reduced); this.ui.reset(); this.refresh(); return; }
     if (this.state.complete) return;
     if (action === 'flavor') return this.select(flavor as Flavor);
     if (action === 'batch' && this.state.selectCake(this.state.active, Number(cake))) { this.ui.select(this.state.active, this.state.cakes[this.state.active].division); this.refresh(); return; }
@@ -35,7 +37,7 @@ export class Controller {
     if (action === 'spread') { this.spread = !this.spread; this.refresh(); }
     if (action === 'take' || action === 'whole') this.pick({ flavor: this.state.active, cakeId: this.state.cakes[this.state.active].id, ids: [action === 'whole' ? 0 : Number(id)], tray: false, shelf: false, whole: action === 'whole' });
     if (action === 'return') this.pick({ flavor: flavor as Flavor, cakeId: Number(cake), ids: ids!.split(',').map(Number), tray: true, shelf: false });
-    if (action === 'simplify' && this.state.simplify(flavor as Flavor)) { this.ui.say(`${flavorInfo(flavor as Flavor).name} pieces joined. Same amount of cake!`, 'success'); this.chime(); this.refresh(); }
+    if (action === 'simplify') this.simplification.open(flavor as Flavor);
     if (action === 'clear') { this.state.clear(); this.ui.say(''); this.refresh(); }
     if (action === 'serve') this.serve();
   }
@@ -102,5 +104,5 @@ export class Controller {
     gain.gain.setValueAtTime(0.035, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
     oscillator.connect(gain); gain.connect(this.sound.destination); oscillator.start(); oscillator.stop(now + 0.18);
   }
-  dispose() { this.disposed = true; this.scene.dispose(); this.sound?.close(); }
+  dispose() { this.disposed = true; this.simplification.close(); this.scene.dispose(); this.sound?.close(); }
 }

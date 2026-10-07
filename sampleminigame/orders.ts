@@ -17,7 +17,7 @@ function shuffled<T>(items: readonly T[], random: Random) {
 }
 function quantity(flavor: Request['flavor'], budget: number, random: Random): Request {
   const denominator = weighted<number>([[2, 2], [3, 3], [4, 5], [5, 4], [6, 6], [7, 3], [8, 7], [9, 3], [10, 5], [11, 2], [12, 8]], random);
-  const numerator = random() < 0.65 ? 1 : 1 + Math.min(denominator - 2, Math.floor(random() * (denominator - 1)));
+  const numerator = 1 + Math.min(denominator - 2, Math.floor(random() * (denominator - 1)));
   const choices: [number, number][] = [[0, 16], [1, 5], [2, 2], [3, 1]];
   const whole = weighted(choices.filter(([n]) => n < budget), random);
   return { flavor, numerator: whole * denominator + numerator, denominator };
