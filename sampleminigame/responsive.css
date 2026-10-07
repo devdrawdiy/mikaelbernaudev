@@ -1,0 +1,67 @@
+@media (max-width: 1100px) and (min-width: 761px) {
+  .ticket { width: 215px; left: 16px; padding: 16px; }
+  .serving { width: 220px; right: 16px; padding: 14px; }
+  .cake-choice { width: 89px; height: 95px; font-size: 10px; }
+  .cake-choice img { width: 60px; height: 60px; }
+  .cake-menu { gap: 6px; }
+  .cutting { left: 34%; width: 350px; }
+  .delivery { right: 18px; width: 230px; }
+  .focus-label { top: 29%; }
+}
+@media (max-width: 760px) {
+  .topbar { height: 74px; padding: 0 14px; gap: 12px; }
+  .brand { gap: 8px; }
+  .brand-mark { width: 34px; height: 34px; font-size: 18px; }
+  h1 { font-size: 24px; }
+  .brand div > span { font-size: 8px; }
+  .progress-wrap { gap: 0; }
+  #guest-counter { font-size: 11px; }
+  #progress { display: none; }
+  .header-tools { gap: 4px; }
+  .header-tools .icon-button { width: 32px; height: 36px; font-size: 14px; }
+  .board { height: auto; min-height: 0; background: #d4e6dc; display: flex; flex-direction: column; padding-bottom: 20px; }
+  .ticket { position: relative; top: auto; left: auto; right: auto; width: auto; margin: 12px 14px; padding: 12px 16px; border-top-width: 3px; }
+  .ticket-heading { margin-bottom: 10px; }
+  .ticket-heading .avatar { width: 30px; height: 30px; }
+  .ticket h2 { font-size: 18px; }
+  .request-list { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+  .request { font-size: 11px; gap: 7px; }
+  .request .fraction { font-size: 14px; min-width: 18px; }
+  .request .flavor-dot { width: 8px; height: 8px; }
+  .cake-menu { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; gap: 8px; }
+  .cake-choice { width: 99px; height: 92px; font-size: 11px; padding: 6px; }
+  .cake-choice img { width: 57px; height: 57px; }
+  .stage { position: relative; inset: auto; height: 280px; order: 2; }
+  .focus-label { position: relative; top: auto; left: auto; transform: none; order: 1; padding-top: 16px; }
+  .focus-label h2 { font-size: 19px; }
+  #focus-fraction { font-size: 10px; margin-top: 0; min-height: 36px; }
+  #focus-fraction .fraction { font-size: 12px; }
+  .cutting { position: relative; top: auto; bottom: auto; left: auto; transform: none; width: auto; margin: 0 12px; order: 3; }
+  .cut-tools { gap: 8px; }
+  .available-pieces { gap: 5px; margin-top: 12px; }
+  .piece-button { width: 42px; height: 42px; }
+  .available-pieces { max-width: 300px; margin-left: auto; margin-right: auto; }
+  .serving { position: relative; top: auto; left: auto; right: auto; width: auto; max-height: none; overflow: visible; margin: 14px; padding: 12px 16px; order: 4; }
+  .serving-heading { margin-bottom: 0; }
+  .serving h2 { font-size: 20px; }
+  #tray-portions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tray-group { padding: 12px 0 0; border: 0; min-width: 0; }
+  .tray-title { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 7px 5px; font-size: 10px; }
+  .tray-title strong { margin-left: 0; grid-column: 1 / -1; justify-self: center; }
+  .tray-title > i { display: none; }
+  .portion-actions { flex-direction: column; gap: 7px; }
+  .return-pieces { min-height: 36px; }
+  .return-pieces button { width: 36px; height: 36px; }
+  .simplify { height: 38px; width: 100%; justify-content: center; }
+  .delivery { position: relative; right: auto; left: auto; bottom: auto; width: auto; margin: 0 14px; order: 5; align-items: center; gap: 8px; }
+  .serve-button { min-width: 190px; }
+  #message { max-width: 370px; min-height: 0; font-size: 12px; box-shadow: 0 3px 18px #294c3420; }
+  #message:empty { display: none; }
+}
+@media (max-width: 360px) {
+  .brand-mark { display: none; }
+  .topbar { padding: 0 10px; }
+  h1 { font-size: 22px; }
+  .cake-choice { width: 94px; }
+  .cake-menu { gap: 6px; }
+}

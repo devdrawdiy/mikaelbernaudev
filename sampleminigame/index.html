@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Little Slice - Fraction Bakery</title>
+      <link rel="icon" href="data:," />
+      <link rel="stylesheet" href="./style.css" />
+      <link rel="stylesheet" href="./responsive.css" />
+   </head>
+   <body>
+      <div id="bakery">
+        <header class="topbar">
+          <div class="brand"><span class="brand-mark"><i class="fa-solid fa-cookie-bite" aria-hidden="true"></i></span><div><h1>Little Slice</h1><span>FRACTION BAKERY</span></div></div>
+          <div class="progress-wrap"><span id="guest-counter">0 / 6 guests</span><div id="progress" aria-hidden="true"></div></div>
+          <div class="header-tools"><button class="icon-button" data-action="replay" aria-label="Start again" title="Start again"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button><button class="icon-button" data-action="sound" aria-label="Turn sound on" aria-pressed="false" title="Turn sound on"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button></div>
+        </header>
+        <main class="board">
+          <div class="stage"><canvas id="game" aria-label="3D bakery with cakes and serving tray"></canvas></div>
+          <section class="ticket" id="ticket" aria-label="Customer order"></section>
+          <nav class="cake-menu" id="cake-menu" aria-label="Choose cake flavor"></nav>
+          <div class="focus-label"><h2 id="focus-name">Chocolate cake</h2><div id="focus-fraction">One whole cake</div></div>
+          <section class="cutting" aria-label="Cut cake">
+            <form id="cut-form"><label for="piece-count">Equal pieces</label><div class="cut-tools"><div class="counter"><button type="button" data-action="minus" aria-label="Fewer pieces" title="Fewer pieces"><i class="fa-solid fa-minus" aria-hidden="true"></i></button><input id="piece-count" type="number" min="2" max="12" step="1" value="4" inputmode="numeric" required /><button type="button" data-action="plus" aria-label="More pieces" title="More pieces"><i class="fa-solid fa-plus" aria-hidden="true"></i></button></div><button type="submit" class="cut-button" data-action="cut"><i class="fa-solid fa-scissors" aria-hidden="true"></i>Cut</button><button type="button" class="icon-button" data-action="spread" aria-label="Spread pieces" title="Spread pieces"><i class="fa-solid fa-expand" aria-hidden="true"></i></button></div></form>
+            <div id="available-pieces" class="available-pieces" aria-label="Cake pieces"></div>
+          </section>
+          <section class="serving" aria-label="Serving tray"><div class="serving-heading"><h2>Your tray</h2><button class="icon-button" data-action="clear" aria-label="Return all pieces" title="Return all pieces"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i></button></div><div id="tray-portions"></div></section>
+          <div class="delivery"><p id="message" role="status" aria-live="polite"></p><button class="serve-button" data-action="serve"><i class="fa-solid fa-bell-concierge" aria-hidden="true"></i>Serve order</button></div>
+        </main>
+        <dialog id="ending" aria-labelledby="ending-title"><span class="ending-mark"><i class="fa-solid fa-check" aria-hidden="true"></i></span><h2 id="ending-title">Everyone has cake!</h2><button class="serve-button" data-action="replay"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Play again</button></dialog>
+      </div>
+      <script type="module" src="./main.ts"></script>
+   </body>
+</html>
